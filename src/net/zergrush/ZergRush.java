@@ -3,7 +3,9 @@ package net.zergrush;
 public class ZergRush {
 
     public static void main(String[] args) {
-        System.out.println("They are coming...");
+        MainUI ui = new MainUI();
+        ui.setMessage("ZERG RUSH", "They are coming...");
+        MainUI.createWindow(ui).setVisible(true);
     }
 
 }
