@@ -15,6 +15,7 @@ public class GameUI extends JComponent {
 
         public void componentResized(ComponentEvent e) {
             gameArea.setSize(-1, -1);
+            repaint();
         }
 
     }
@@ -46,6 +47,7 @@ public class GameUI extends JComponent {
         Graphics2D g = (Graphics2D) graphics.create();
         // Draw game area.
         g.transform(gameAreaTransform);
+        g.setClip(-1, -1, 2, 2);
         // NYI
         // Draw borders.
         graphics.setColor(BORDER_COLOR);
