@@ -1,29 +1,27 @@
-package net.zergrush;
+package net.zergrush.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.geom.Rectangle2D;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
+import net.zergrush.GameUI;
 
-public class MainUI extends JPanel {
+public class MainUI extends JPanel implements GameUI {
 
-    private final GameUI gameUI;
+    private final GameArea gameArea;
     private final JLabel headingMessage;
     private final JLabel textMessage;
 
     public MainUI() {
-        gameUI = new GameUI();
+        gameArea = new GameArea();
         headingMessage = new JLabel();
         textMessage = new JLabel();
         createUI();
-    }
-
-    public GameUI getGameUI() {
-        return gameUI;
     }
 
     protected Font getBaseFont() {
@@ -54,7 +52,7 @@ public class MainUI extends JPanel {
         messageOverlay.setOpaque(false);
         add(messageOverlay);
 
-        add(gameUI);
+        add(gameArea);
     }
 
     public void setMessage(String heading, String text) {
@@ -62,6 +60,10 @@ public class MainUI extends JPanel {
         if (heading != null) headingMessage.setText(heading);
         textMessage.setVisible(text != null);
         if (text != null) textMessage.setText(text);
+    }
+
+    public void markDamaged(Rectangle2D rect) {
+        gameArea.markDamaged(rect);
     }
 
     public static JFrame createWindow(MainUI ui) {
