@@ -11,13 +11,19 @@ import javax.swing.OverlayLayout;
 
 public class MainUI extends JPanel {
 
+    private final GameUI gameUI;
     private final JLabel headingMessage;
     private final JLabel textMessage;
 
     public MainUI() {
+        gameUI = new GameUI();
         headingMessage = new JLabel();
         textMessage = new JLabel();
         createUI();
+    }
+
+    public GameUI getGameUI() {
+        return gameUI;
     }
 
     protected Font getBaseFont() {
@@ -47,6 +53,8 @@ public class MainUI extends JPanel {
 
         messageOverlay.setOpaque(false);
         add(messageOverlay);
+
+        add(gameUI);
     }
 
     public void setMessage(String heading, String text) {
