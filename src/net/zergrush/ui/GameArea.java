@@ -9,6 +9,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import javax.swing.JComponent;
+import net.zergrush.Game;
 
 public class GameArea extends JComponent {
 
@@ -25,11 +26,16 @@ public class GameArea extends JComponent {
 
     private final Rectangle gameArea;
     private final AffineTransform gameAreaTransform;
+    private Game game;
 
     public GameArea() {
         gameArea = new Rectangle(0, 0, -1, -1);
         gameAreaTransform = new AffineTransform();
         addComponentListener(new ResizeListener());
+    }
+
+    public void setGame(Game g) {
+        game = g;
     }
 
     protected void calculateGameArea() {
@@ -46,11 +52,14 @@ public class GameArea extends JComponent {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         calculateGameArea();
-        Graphics2D g = (Graphics2D) graphics.create();
         // Draw game area.
-        g.transform(gameAreaTransform);
-        g.setClip(-1, -1, 2, 2);
-        // NYI
+        if (game != null) {
+            Graphics2D g = (Graphics2D) graphics.create();
+            g.transform(gameAreaTransform);
+            g.setClip(-1, -1, 2, 2);
+            game.draw(g);
+            g.dispose();
+        }
         // Draw borders.
         graphics.setColor(BORDER_COLOR);
         final int width = getWidth(), height = getHeight();

@@ -3,12 +3,16 @@ package net.zergrush.ui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
+import javax.swing.Timer;
+import net.zergrush.Game;
 import net.zergrush.GameUI;
 
 public class MainUI extends JPanel implements GameUI {
@@ -55,6 +59,10 @@ public class MainUI extends JPanel implements GameUI {
         add(gameArea);
     }
 
+    public void setGame(Game game) {
+        gameArea.setGame(game);
+    }
+
     public void setMessage(String heading, String text) {
         headingMessage.setVisible(heading != null);
         if (heading != null) headingMessage.setText(heading);
@@ -64,6 +72,16 @@ public class MainUI extends JPanel implements GameUI {
 
     public void markDamaged(Rectangle2D rect) {
         gameArea.markDamaged(rect);
+    }
+
+    // While this is not strictly not a responsibility of the UI, Swing likes
+    // to have timers its own way anyway.
+    public static void scheduleRepeatedly(final Runnable r, int delay) {
+        new Timer(delay, new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                r.run();
+            }
+        }).start();
     }
 
     public static JFrame createWindow(MainUI ui) {
