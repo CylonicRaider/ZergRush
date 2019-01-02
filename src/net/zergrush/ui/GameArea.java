@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
@@ -22,7 +23,15 @@ public class GameArea extends JComponent {
 
     }
 
-    private static final Color BORDER_COLOR = new Color(0x404040);
+    public static final Color BORDER_COLOR = new Color(0x404040);
+
+    private static final RenderingHints RENDERING_HINTS;
+
+    static {
+        RENDERING_HINTS = new RenderingHints(null);
+        RENDERING_HINTS.put(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_ON);
+    }
 
     private final Rectangle gameArea;
     private final AffineTransform gameAreaTransform;
@@ -57,6 +66,7 @@ public class GameArea extends JComponent {
             Graphics2D g = (Graphics2D) graphics.create();
             g.transform(gameAreaTransform);
             g.setClip(-1, -1, 2, 2);
+            g.addRenderingHints(RENDERING_HINTS);
             game.draw(g);
             g.dispose();
         }
