@@ -24,6 +24,7 @@ public class Game {
         } else {
             ui.markDamaged(demoZerg.getBounds());
         }
+        ui.update();
     }
 
     public void draw(Graphics2D g) {

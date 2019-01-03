@@ -5,7 +5,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,14 +21,30 @@ import net.zergrush.GameUI;
 
 public class MainUI extends JPanel implements GameUI {
 
+    protected class KeyTracker extends KeyAdapter {
+
+        public void keyPressed(KeyEvent e) {
+            if (trackedKeys.containsKey(e.getKeyCode()))
+                trackedKeys.put(e.getKeyCode(), KEY_PRESSED_INITIAL);
+        }
+
+        public void keyReleased(KeyEvent e) {
+            if (trackedKeys.containsKey(e.getKeyCode()))
+                trackedKeys.put(e.getKeyCode(), KEY_RELEASED);
+        }
+
+    }
+
     private final GameArea gameArea;
     private final JLabel headingMessage;
     private final JLabel textMessage;
+    private final Map<Integer, Integer> trackedKeys;
 
     public MainUI() {
         gameArea = new GameArea();
         headingMessage = new JLabel();
         textMessage = new JLabel();
+        trackedKeys = new HashMap<>();
         createUI();
     }
 
@@ -57,6 +77,8 @@ public class MainUI extends JPanel implements GameUI {
         add(messageOverlay);
 
         add(gameArea);
+
+        addKeyListener(new KeyTracker());
     }
 
     public void setGame(Game game) {
@@ -72,6 +94,27 @@ public class MainUI extends JPanel implements GameUI {
 
     public void markDamaged(Rectangle2D rect) {
         gameArea.markDamaged(rect);
+    }
+
+    public void update() {
+        for (Map.Entry<Integer, Integer> ent : trackedKeys.entrySet()) {
+            if (ent.getValue() == KEY_PRESSED_INITIAL)
+                ent.setValue(KEY_PRESSED);
+        }
+    }
+
+    public void trackKey(int keyCode) {
+        trackedKeys.put(keyCode, KEY_UNKNOWN);
+    }
+
+    public int getKeyStatus(int keyCode) {
+        Integer ret = trackedKeys.get(keyCode);
+        if (ret == null) return KEY_UNKNOWN;
+        return ret;
+    }
+
+    public void untrackKey(int keyCode) {
+        trackedKeys.remove(keyCode);
     }
 
     // While this is not strictly not a responsibility of the UI, Swing likes
@@ -91,6 +134,7 @@ public class MainUI extends JPanel implements GameUI {
         window.pack();
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ui.requestFocusInWindow();
         return window;
     }
 
