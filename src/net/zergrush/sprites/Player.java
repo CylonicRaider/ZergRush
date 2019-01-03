@@ -18,7 +18,6 @@ public class Player extends Sprite {
     public static final double SPEED = 0.03;
     public static final double BOUND = 0.8;
     public static final Color COLOR = new Color(0x008000);
-
     public static final Shape SHAPE;
 
     static {
@@ -63,7 +62,7 @@ public class Player extends Sprite {
     public void draw(Graphics2D g) {
         g.setColor(COLOR);
         AffineTransform tr = g.getTransform();
-        g.translate(position.getX(), position.getY());
+        g.translate(position.x, position.y);
         g.rotate(Math.PI / 2 * rot.ordinal());
         g.fill(SHAPE);
         g.setTransform(tr);

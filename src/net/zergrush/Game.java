@@ -3,6 +3,7 @@ package net.zergrush;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import net.zergrush.sprites.Player;
+import net.zergrush.sprites.Sprite;
 import net.zergrush.sprites.Zerg;
 
 public class Game {
@@ -24,23 +25,17 @@ public class Game {
         return ui;
     }
 
+    private boolean updateSprite(Sprite spr) {
+        if (spr == null) return true;
+        ui.markDamaged(spr.getBounds());
+        boolean ret = spr.update();
+        if (ret) ui.markDamaged(spr.getBounds());
+        return ret;
+    }
+
     public void update() {
-        if (player != null) {
-            ui.markDamaged(player.getBounds());
-            if (! player.update()) {
-                player = null;
-            } else {
-                ui.markDamaged(player.getBounds());
-            }
-        }
-        if (demoZerg != null) {
-            ui.markDamaged(demoZerg.getBounds());
-            if (! demoZerg.update()) {
-                demoZerg = null;
-            } else {
-                ui.markDamaged(demoZerg.getBounds());
-            }
-        }
+        if (! updateSprite(player)) player = null;
+        if (! updateSprite(demoZerg)) demoZerg = null;
         ui.update();
     }
 
