@@ -8,16 +8,17 @@ import net.zergrush.Game;
 
 public class Zerg extends Sprite {
 
-    public static final double SIZE = 0.1;
-    public static final double SPEED = 0.01;
+    public static final double SIZE = 0.15;
+    public static final double SPEED = 0.005;
     public static final Color COLOR = new Color(0x800000);
 
     private double sx, sy;
 
     public Zerg(Game game) {
         super(game);
-        sx = Math.random() * SPEED - SPEED / 2;
-        sy = Math.random() * SPEED - SPEED / 2;
+        double angle = 2 * Math.PI * Math.random();
+        sx = SPEED * Math.cos(angle);
+        sy = SPEED * Math.sin(angle);
         baseBounds.setRect(-SIZE / 2, -SIZE / 2, SIZE, SIZE);
     }
 

@@ -119,8 +119,8 @@ public class MainUI extends JPanel implements GameUI {
 
     public static JFrame createWindow(MainUI ui) {
         JFrame window = new JFrame("Zerg Rush");
+        ui.setPreferredSize(new Dimension(480, 480));
         window.add(ui);
-        window.setPreferredSize(new Dimension(320, 240));
         window.pack();
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

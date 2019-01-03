@@ -14,8 +14,8 @@ public class Player extends Sprite {
 
     public enum Orientation { RIGHT, DOWN, LEFT, UP }
 
-    public static final double SIZE = 0.1;
-    public static final double SPEED = 0.03;
+    public static final double SIZE = 0.2;
+    public static final double SPEED = 0.025;
     public static final double BOUND = 0.8;
     public static final Color COLOR = new Color(0x008000);
     public static final Shape SHAPE;
