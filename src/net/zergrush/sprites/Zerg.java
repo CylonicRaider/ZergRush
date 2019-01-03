@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import net.zergrush.Game;
 
 public class Zerg extends Sprite {
 
@@ -13,7 +14,8 @@ public class Zerg extends Sprite {
 
     private double sx, sy;
 
-    public Zerg() {
+    public Zerg(Game game) {
+        super(game);
         sx = Math.random() * SPEED - SPEED / 2;
         sy = Math.random() * SPEED - SPEED / 2;
         baseBounds.setRect(-SIZE / 2, -SIZE / 2, SIZE, SIZE);

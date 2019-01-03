@@ -4,7 +4,6 @@ import java.awt.geom.Rectangle2D;
 
 public interface GameUI {
 
-    int KEY_UNKNOWN = -1;
     int KEY_RELEASED = 0;
     int KEY_PRESSED = 1;
     int KEY_PRESSED_INITIAL = 2;
@@ -17,10 +16,6 @@ public interface GameUI {
 
     void update();
 
-    void trackKey(int keyCode);
-
     int getKeyStatus(int keyCode);
-
-    void untrackKey(int keyCode);
 
 }

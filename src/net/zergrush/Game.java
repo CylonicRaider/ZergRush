@@ -12,8 +12,12 @@ public class Game {
 
     public Game(GameUI ui) {
         this.ui = ui;
-        this.demoZerg = new Zerg();
+        this.demoZerg = new Zerg(this);
         ui.setGame(this);
+    }
+
+    public GameUI getUI() {
+        return ui;
     }
 
     public void update() {

@@ -24,13 +24,11 @@ public class MainUI extends JPanel implements GameUI {
     protected class KeyTracker extends KeyAdapter {
 
         public void keyPressed(KeyEvent e) {
-            if (trackedKeys.containsKey(e.getKeyCode()))
-                trackedKeys.put(e.getKeyCode(), KEY_PRESSED_INITIAL);
+            keyStates.put(e.getKeyCode(), KEY_PRESSED_INITIAL);
         }
 
         public void keyReleased(KeyEvent e) {
-            if (trackedKeys.containsKey(e.getKeyCode()))
-                trackedKeys.put(e.getKeyCode(), KEY_RELEASED);
+            keyStates.remove(e.getKeyCode());
         }
 
     }
@@ -38,13 +36,13 @@ public class MainUI extends JPanel implements GameUI {
     private final GameArea gameArea;
     private final JLabel headingMessage;
     private final JLabel textMessage;
-    private final Map<Integer, Integer> trackedKeys;
+    private final Map<Integer, Integer> keyStates;
 
     public MainUI() {
         gameArea = new GameArea();
         headingMessage = new JLabel();
         textMessage = new JLabel();
-        trackedKeys = new HashMap<>();
+        keyStates = new HashMap<>();
         createUI();
     }
 
@@ -97,24 +95,16 @@ public class MainUI extends JPanel implements GameUI {
     }
 
     public void update() {
-        for (Map.Entry<Integer, Integer> ent : trackedKeys.entrySet()) {
+        for (Map.Entry<Integer, Integer> ent : keyStates.entrySet()) {
             if (ent.getValue() == KEY_PRESSED_INITIAL)
                 ent.setValue(KEY_PRESSED);
         }
     }
 
-    public void trackKey(int keyCode) {
-        trackedKeys.put(keyCode, KEY_UNKNOWN);
-    }
-
     public int getKeyStatus(int keyCode) {
-        Integer ret = trackedKeys.get(keyCode);
-        if (ret == null) return KEY_UNKNOWN;
+        Integer ret = keyStates.get(keyCode);
+        if (ret == null) return KEY_RELEASED;
         return ret;
-    }
-
-    public void untrackKey(int keyCode) {
-        trackedKeys.remove(keyCode);
     }
 
     // While this is not strictly not a responsibility of the UI, Swing likes
