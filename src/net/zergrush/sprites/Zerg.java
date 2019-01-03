@@ -27,17 +27,17 @@ public class Zerg extends Sprite {
     }
 
     public boolean update() {
-        position.setLocation(position.getX() + sx, position.getY() + sy);
+        position.setLocation(position.x + sx, position.y + sy);
         // We will replace this with homing toward the base once the latter is
         // implemented.
-        if (position.getX() <= -1) {
+        if (position.x <= -1) {
             sx = Math.abs(sx);
-        } else if (position.getX() >= 1) {
+        } else if (position.x >= 1) {
             sx = -Math.abs(sx);
         }
-        if (position.getY() <= -1) {
+        if (position.y <= -1) {
             sy = Math.abs(sy);
-        } else if (position.getY() >= 1) {
+        } else if (position.y >= 1) {
             sy = -Math.abs(sy);
         }
         return true;

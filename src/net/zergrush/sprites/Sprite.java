@@ -9,8 +9,8 @@ import net.zergrush.GameUI;
 public abstract class Sprite {
 
     protected final Game game;
-    protected final Point2D position;
-    protected final Rectangle2D baseBounds;
+    protected final Point2D.Double position;
+    protected final Rectangle2D.Double baseBounds;
 
     public Sprite(Game game) {
         this.game = game;
@@ -23,9 +23,8 @@ public abstract class Sprite {
     }
 
     public Rectangle2D getBounds() {
-        return new Rectangle2D.Double(position.getX() + baseBounds.getX(),
-            position.getY() + baseBounds.getY(), baseBounds.getWidth(),
-            baseBounds.getHeight());
+        return new Rectangle2D.Double(position.x + baseBounds.x,
+            position.y + baseBounds.y, baseBounds.width, baseBounds.height);
     }
 
     public abstract void draw(Graphics2D g);
