@@ -69,13 +69,13 @@ public class Player extends Sprite {
     }
 
     public boolean update() {
-        if (isKeyPressed(KeyEvent.VK_UP)) {
+        if (game.isKeyPressed(KeyEvent.VK_UP)) {
             move(Orientation.UP);
-        } else if (isKeyPressed(KeyEvent.VK_DOWN)) {
+        } else if (game.isKeyPressed(KeyEvent.VK_DOWN)) {
             move(Orientation.DOWN);
-        } else if (isKeyPressed(KeyEvent.VK_LEFT)) {
+        } else if (game.isKeyPressed(KeyEvent.VK_LEFT)) {
             move(Orientation.LEFT);
-        } else if (isKeyPressed(KeyEvent.VK_RIGHT)) {
+        } else if (game.isKeyPressed(KeyEvent.VK_RIGHT)) {
             move(Orientation.RIGHT);
         }
         return true;

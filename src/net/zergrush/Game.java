@@ -57,4 +57,13 @@ public class Game {
         };
     }
 
+    public boolean isKeyPressed(int keyCode) {
+        return ui.getKeyStatus(keyCode) >= GameUI.KEY_PRESSED;
+    }
+
+    public boolean isKeyPressedFirst(int keyCode) {
+        int status = ui.getKeyStatus(keyCode);
+        return status == GameUI.KEY_PRESSED_INITIAL;
+    }
+
 }

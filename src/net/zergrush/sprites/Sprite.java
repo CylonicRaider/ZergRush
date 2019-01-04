@@ -31,13 +31,4 @@ public abstract class Sprite {
 
     public abstract boolean update();
 
-    protected boolean isKeyPressed(int keyCode) {
-        return game.getUI().getKeyStatus(keyCode) >= GameUI.KEY_PRESSED;
-    }
-
-    protected boolean isKeyPressedFirst(int keyCode) {
-        int status = game.getUI().getKeyStatus(keyCode);
-        return status == GameUI.KEY_PRESSED_INITIAL;
-    }
-
 }
