@@ -15,11 +15,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import net.zergrush.Game;
 import net.zergrush.GameUI;
 
-public class MainUI extends JPanel implements GameUI {
+public class MainUI extends JPanel implements GameUI,
+        GameArea.FontSizeListener {
 
     protected class KeyTracker extends KeyAdapter {
 
@@ -47,36 +49,52 @@ public class MainUI extends JPanel implements GameUI {
     }
 
     protected Font getBaseFont() {
-        return new Font("Helvetica", Font.PLAIN, 12);
+        int fontSize = gameArea.getFontSize();
+        if (fontSize == -1) fontSize = 12;
+        return new Font("Helvetica", Font.PLAIN, fontSize);
     }
 
     protected void createUI() {
         setBackground(Color.WHITE);
         setLayout(new OverlayLayout(this));
 
-        Font baseFont = getBaseFont();
-
         JPanel messageOverlay = new JPanel();
         messageOverlay.setLayout(new BoxLayout(messageOverlay,
                                                BoxLayout.Y_AXIS));
 
         headingMessage.setAlignmentX(CENTER_ALIGNMENT);
-        headingMessage.setFont(baseFont.deriveFont(Font.BOLD)
-            .deriveFont(2.0f * baseFont.getSize()));
         headingMessage.setForeground(Color.BLACK);
         messageOverlay.add(headingMessage);
 
         textMessage.setAlignmentX(CENTER_ALIGNMENT);
-        textMessage.setFont(baseFont.deriveFont(Font.ITALIC));
         textMessage.setForeground(Color.BLACK);
         messageOverlay.add(textMessage);
 
         messageOverlay.setOpaque(false);
         add(messageOverlay);
 
+        gameArea.setFSListener(this);
         add(gameArea);
 
         addKeyListener(new KeyTracker());
+
+        updateFonts();
+    }
+
+    protected void updateFonts() {
+        Font baseFont = getBaseFont();
+        headingMessage.setFont(baseFont.deriveFont(Font.BOLD)
+            .deriveFont(2.0f * baseFont.getSize()));
+        textMessage.setFont(baseFont.deriveFont(Font.ITALIC));
+    }
+
+    public void onFontSizeChanged(int newSize) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                updateFonts();
+                invalidate();
+            }
+        });
     }
 
     public void setGame(Game game) {

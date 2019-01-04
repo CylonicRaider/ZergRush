@@ -14,6 +14,12 @@ import net.zergrush.Game;
 
 public class GameArea extends JComponent {
 
+    public interface FontSizeListener {
+
+        void onFontSizeChanged(int newSize);
+
+    }
+
     protected class ResizeListener extends ComponentAdapter {
 
         public void componentResized(ComponentEvent e) {
@@ -23,6 +29,7 @@ public class GameArea extends JComponent {
 
     }
 
+    public static final double FONT_SIZE = 0.05;
     public static final Color BORDER_COLOR = new Color(0x404040);
 
     private static final RenderingHints RENDERING_HINTS;
@@ -35,27 +42,52 @@ public class GameArea extends JComponent {
 
     private final Rectangle gameArea;
     private final AffineTransform gameAreaTransform;
+    private FontSizeListener fsListener;
+    private int fontSize;
     private Game game;
 
     public GameArea() {
         gameArea = new Rectangle(0, 0, -1, -1);
         gameAreaTransform = new AffineTransform();
+        fontSize = -1;
         addComponentListener(new ResizeListener());
+    }
+
+    public FontSizeListener getFSListener() {
+        return fsListener;
+    }
+
+    public void setFSListener(FontSizeListener l) {
+        fsListener = l;
     }
 
     public void setGame(Game g) {
         game = g;
     }
 
+    public int getFontSize() {
+        return fontSize;
+    }
+
     protected void calculateGameArea() {
         if (gameArea.width >= 0) return;
-        final int width = getWidth(), height = getHeight();
-        final int size = Math.min(width, height);
+        int width = getWidth(), height = getHeight();
+        int size = Math.min(width, height);
         gameArea.setLocation((width - size) / 2, (height - size) / 2);
         gameArea.setSize(size, size);
-        final double factor = size / 2.0;
+        double factor = size / 2.0;
         gameAreaTransform.setTransform(factor, 0, 0, factor,
             gameArea.x + factor, gameArea.y + factor);
+        updateFontSize();
+    }
+
+    protected void updateFontSize() {
+        if (gameArea.width < 0) calculateGameArea();
+        int newFontSize = (int) (gameArea.width * FONT_SIZE);
+        if (newFontSize != fontSize) {
+            fontSize = newFontSize;
+            if (fsListener != null) fsListener.onFontSizeChanged(newFontSize);
+        }
     }
 
     protected void paintComponent(Graphics graphics) {
@@ -94,6 +126,11 @@ public class GameArea extends JComponent {
         final int top = (int) Math.floor(coords[1]);
         repaint(0, left, top, (int) Math.ceil(coords[2] - left),
                 (int) Math.ceil(coords[3] - top));
+    }
+
+    public void doLayout() {
+        super.doLayout();
+        updateFontSize();
     }
 
 }
