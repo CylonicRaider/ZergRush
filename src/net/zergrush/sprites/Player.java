@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.awt.event.KeyEvent;
 import net.zergrush.Game;
 
@@ -11,6 +12,7 @@ public class Player extends ShapeSprite {
 
     public enum Orientation { RIGHT, DOWN, LEFT, UP }
 
+    public static final double HITPOINTS = 50;
     public static final double SIZE = 0.2;
     public static final double SPEED = 0.025;
     public static final double BOUND = 0.8;
@@ -28,10 +30,11 @@ public class Player extends ShapeSprite {
 
     private Orientation rot;
 
-    public Player(Game game) {
-        super(game);
+    public Player(Game game, Point2D position) {
+        super(game, position);
         rot = Orientation.RIGHT;
         initShape(SHAPE, COLOR);
+        initHP(HITPOINTS);
     }
 
     public void move(Orientation dir) {
