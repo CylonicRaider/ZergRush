@@ -30,10 +30,7 @@ public class Game {
 
     private boolean updateSprite(Sprite spr) {
         if (spr == null) return true;
-        ui.markDamaged(spr.getBounds());
-        boolean ret = spr.update();
-        if (ret) ui.markDamaged(spr.getBounds());
-        return ret;
+        return spr.update();
     }
 
     public void update() {

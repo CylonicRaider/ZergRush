@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import net.zergrush.Game;
-import net.zergrush.GameUI;
 
 public abstract class Sprite {
 
@@ -29,6 +28,13 @@ public abstract class Sprite {
 
     public abstract void draw(Graphics2D g);
 
-    public abstract boolean update();
+    public boolean update() {
+        game.getUI().markDamaged(getBounds());
+        boolean ret = updateSelf();
+        if (ret) game.getUI().markDamaged(getBounds());
+        return ret;
+    }
+
+    protected abstract boolean updateSelf();
 
 }

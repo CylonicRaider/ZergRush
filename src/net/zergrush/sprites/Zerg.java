@@ -2,8 +2,6 @@ package net.zergrush.sprites;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import net.zergrush.Game;
 
 public class Zerg extends Sprite {
@@ -16,10 +14,10 @@ public class Zerg extends Sprite {
 
     public Zerg(Game game) {
         super(game);
+        baseBounds.setRect(-SIZE / 2, -SIZE / 2, SIZE, SIZE);
         double angle = 2 * Math.PI * Math.random();
         sx = SPEED * Math.cos(angle);
         sy = SPEED * Math.sin(angle);
-        baseBounds.setRect(-SIZE / 2, -SIZE / 2, SIZE, SIZE);
     }
 
     public void draw(Graphics2D g) {
@@ -27,7 +25,7 @@ public class Zerg extends Sprite {
         g.fill(getBounds());
     }
 
-    public boolean update() {
+    public boolean updateSelf() {
         position.setLocation(position.x + sx, position.y + sy);
         // We will replace this with homing toward the base once the latter is
         // implemented.

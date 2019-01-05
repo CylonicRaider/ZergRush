@@ -3,14 +3,11 @@ package net.zergrush.sprites;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.event.KeyEvent;
 import net.zergrush.Game;
 
-public class Player extends Sprite {
+public class Player extends ShapeSprite {
 
     public enum Orientation { RIGHT, DOWN, LEFT, UP }
 
@@ -34,7 +31,7 @@ public class Player extends Sprite {
     public Player(Game game) {
         super(game);
         rot = Orientation.RIGHT;
-        baseBounds.setRect(-SIZE / 2, -SIZE / 2, SIZE, SIZE);
+        initShape(SHAPE, COLOR);
     }
 
     public void move(Orientation dir) {
@@ -59,16 +56,12 @@ public class Player extends Sprite {
         }
     }
 
-    public void draw(Graphics2D g) {
-        g.setColor(COLOR);
-        AffineTransform tr = g.getTransform();
-        g.translate(position.x, position.y);
+    protected void drawSelf(Graphics2D g) {
         g.rotate(Math.PI / 2 * rot.ordinal());
-        g.fill(SHAPE);
-        g.setTransform(tr);
+        super.drawSelf(g);
     }
 
-    public boolean update() {
+    public boolean updateSelf() {
         if (game.isKeyPressed(KeyEvent.VK_UP)) {
             move(Orientation.UP);
         } else if (game.isKeyPressed(KeyEvent.VK_DOWN)) {
