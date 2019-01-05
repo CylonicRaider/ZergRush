@@ -51,7 +51,7 @@ public class MainUI extends JPanel implements GameUI,
     protected Font getBaseFont() {
         int fontSize = gameArea.getFontSize();
         if (fontSize == -1) fontSize = 12;
-        return new Font("Helvetica", Font.PLAIN, fontSize);
+        return new Font(Font.SANS_SERIF, Font.PLAIN, fontSize);
     }
 
     protected void createUI() {
