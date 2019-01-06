@@ -75,6 +75,12 @@ public class Game {
         }
     }
 
+    private void eraseSprite(Sprite spr) {
+        if (spr == null) return;
+        ui.markDamaged(spr.getBounds());
+        if (spr instanceof HPSprite)
+            ui.markDamaged(((HPSprite) spr).getHPBar().getBounds());
+    }
     private void updateSprite(Sprite spr) {
         if (spr == null) return;
         spr.update();
@@ -88,10 +94,6 @@ public class Game {
             if (i < sprites.size() && sprites.get(i) != spr) i--;
         }
     }
-    private void updateHPBar(HPSprite spr) {
-        if (spr == null || spr.getHPBar() == null) return;
-        spr.getHPBar().update();
-    }
 
     public boolean update() {
         /* Check for keyboard input */
@@ -99,28 +101,29 @@ public class Game {
             return false;
         if (state != State.PLAYING && isKeyPressedFirst(KeyEvent.VK_ENTER))
             setState(State.PLAYING);
+        /* Erase sprites
+         * This has to happen before the updating pass because some HP bars
+         * might be missed otherwise. */
+        eraseSprite(base);
+        for (Zerg z : zergs) eraseSprite(z);
+        eraseSprite(player);
         /* Update sprites */
         updateSprite(base);
         updateSpriteList(zergs);
         updateSprite(player);
-        updateHPBar(base);
-        for (Zerg z : zergs) updateHPBar(z);
-        updateHPBar(player);
         /* Spawn new zergs as necessary */
         if (zergCountCounter-- <= 0) {
             zergCount++;
             zergCountCounter = ZERG_COUNT_INCR_COUNTER;
         }
-        if (zergs.size() < zergCount && base != null && player != null) {
+        if (zergs.size() < zergCount && (base != null || player != null)) {
             Point2D position = new Point2D.Double();
             while (zergs.size() < zergCount) {
                 position.setLocation(Math.random() * 2 - 1,
                                      (Math.random() < 0.5) ? -1 : 1);
                 if (Math.random() < 0.5)
                     position.setLocation(position.getY(), position.getX());
-                Zerg z = new Zerg(this, position);
-                z.setTarget(base.getPosition());
-                zergs.add(z);
+                zergs.add(new Zerg(this, position));
             }
         }
         /* Update UI; done */

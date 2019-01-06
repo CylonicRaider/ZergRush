@@ -38,6 +38,11 @@ public abstract class HPSprite extends Sprite {
         bar.changeHP(increment);
     }
 
+    public void update() {
+        super.update();
+        bar.update();
+    }
+
     protected <T extends HPSprite> void addHealth(Class<T> cls,
                                                   double strength) {
         List<T> intersecting = game.getIntersecting(this, cls);

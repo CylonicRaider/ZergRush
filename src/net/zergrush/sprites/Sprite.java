@@ -33,7 +33,6 @@ public abstract class Sprite {
     public abstract void draw(Graphics2D g);
 
     public void update() {
-        game.getUI().markDamaged(getBounds());
         updateSelf();
         game.getUI().markDamaged(getBounds());
     }
