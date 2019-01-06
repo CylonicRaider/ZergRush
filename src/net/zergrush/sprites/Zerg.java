@@ -38,10 +38,13 @@ public class Zerg extends HPSprite {
     }
 
     public void updateSelf() {
-        if (! mode.moveTo(position, target, SPEED)) {
+        // The bitwise OR is intentional -- a zerg can battle the base and
+        // the player at the same time.
+        if (battleWith(Base.class, ATTACK) |
+                battleWith(Player.class, ATTACK)) {
             stayCounter = STAY_COUNT;
-            battleWith(Base.class, ATTACK);
-            battleWith(Player.class, ATTACK);
+        } else if (! mode.moveTo(position, target, SPEED)) {
+            stayCounter = STAY_COUNT;
         } else if (getHP() < getHPMax()) {
             changeHP(HEALING);
         } else if (stayCounter > 0) {

@@ -43,18 +43,19 @@ public abstract class HPSprite extends Sprite {
         bar.update();
     }
 
-    protected <T extends HPSprite> void addHealth(Class<T> cls,
-                                                  double strength) {
+    protected <T extends HPSprite> boolean addHealth(Class<T> cls,
+                                                     double strength) {
         List<T> intersecting = game.getIntersecting(this, cls);
         for (T other : intersecting) {
             other.changeHP(strength);
             if (other.getHP() == 0) game.removeSprite(other);
         }
+        return (! intersecting.isEmpty());
     }
 
-    protected <T extends HPSprite> void battleWith(Class<T> cls,
-                                                   double strength) {
-        addHealth(cls, -strength);
+    protected <T extends HPSprite> boolean battleWith(Class<T> cls,
+                                                      double strength) {
+        return addHealth(cls, -strength);
     }
 
 }

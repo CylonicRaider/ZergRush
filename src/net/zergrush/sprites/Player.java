@@ -6,6 +6,7 @@ import java.awt.Shape;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import net.zergrush.Game;
 
 public class Player extends ShapeSprite {
@@ -65,7 +66,20 @@ public class Player extends ShapeSprite {
         super.drawSelf(g);
     }
 
+    private double getDistanceSqTo(List<? extends Sprite> others) {
+        double ret = Double.POSITIVE_INFINITY;
+        for (Sprite s : others) {
+            ret = Math.min(ret, position.distanceSq(s.position));
+        }
+        return ret;
+    }
+
     public void updateSelf() {
+        /* Store values for the rule below */
+        double oldZergDist = getDistanceSqTo(game.getIntersecting(this,
+            Zerg.class));
+        double oldX = position.x, oldY = position.y;
+        /* Obey keyboard input */
         if (game.isKeyPressed(KeyEvent.VK_UP)) {
             move(Orientation.UP);
         } else if (game.isKeyPressed(KeyEvent.VK_DOWN)) {
@@ -75,6 +89,14 @@ public class Player extends ShapeSprite {
         } else if (game.isKeyPressed(KeyEvent.VK_RIGHT)) {
             move(Orientation.RIGHT);
         }
+        /* Do not allow running over zergs while battling them */
+        if (oldZergDist < Double.POSITIVE_INFINITY) {
+            double newZergDist = getDistanceSqTo(game.getIntersecting(this,
+                Zerg.class));
+            if (newZergDist < oldZergDist)
+                position.setLocation(oldX, oldY);
+        }
+        /* Finally, battle the zergs one (still) hits */
         battleWith(Zerg.class, ATTACK);
     }
 
