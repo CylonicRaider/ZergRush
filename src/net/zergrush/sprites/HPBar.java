@@ -29,7 +29,7 @@ public class HPBar extends Sprite {
         return value;
     }
 
-    public double getMaxHP() {
+    public double getHPMax() {
         return max;
     }
 
@@ -42,8 +42,8 @@ public class HPBar extends Sprite {
         setHP(v, v);
     }
 
-    public void changeHP(double v) {
-        value += v;
+    public void changeHP(double increment) {
+        value += increment;
         if (value < 0) value = 0;
         if (value > max) value = max;
     }

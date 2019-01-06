@@ -88,6 +88,11 @@ public class Game {
         if (player != null) player.getHPBar().draw(g);
     }
 
+    public void removeSprite(Sprite spr) {
+        if (spr == base) base = null;
+        if (player == null) player = null;
+    }
+
     public boolean isKeyPressed(int keyCode) {
         return ui.getKeyStatus(keyCode) >= GameUI.KEY_PRESSED;
     }

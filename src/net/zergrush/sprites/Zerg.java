@@ -8,19 +8,28 @@ import net.zergrush.Game;
 public class Zerg extends HPSprite {
 
     public static final double HITPOINTS = 10;
+    public static final double ATTACK = 1;
+    public static final double HEALING = 1;
+    public static final int STAY_COUNT = 5;
     public static final double SIZE = 0.15;
     public static final double SPEED = 0.005;
     public static final Color COLOR = new Color(0x800000);
 
-    private double sx, sy;
+    protected final Point2D.Double target;
+    protected final HomingMode mode;
+    private int stayCounter;
 
     public Zerg(Game game, Point2D position) {
         super(game, position);
         baseBounds.setRect(-SIZE / 2, -SIZE / 2, SIZE, SIZE);
         initHP(HITPOINTS);
-        double angle = 2 * Math.PI * Math.random();
-        sx = SPEED * Math.cos(angle);
-        sy = SPEED * Math.sin(angle);
+        target = new Point2D.Double();
+        mode = HomingMode.selectRandom();
+        stayCounter = STAY_COUNT;
+    }
+
+    public void setTarget(Point2D t) {
+        target.setLocation(t);
     }
 
     public void draw(Graphics2D g) {
@@ -29,18 +38,14 @@ public class Zerg extends HPSprite {
     }
 
     public void updateSelf() {
-        position.setLocation(position.x + sx, position.y + sy);
-        // We will replace this with homing toward the base once the latter is
-        // implemented.
-        if (position.x <= -1) {
-            sx = Math.abs(sx);
-        } else if (position.x >= 1) {
-            sx = -Math.abs(sx);
-        }
-        if (position.y <= -1) {
-            sy = Math.abs(sy);
-        } else if (position.y >= 1) {
-            sy = -Math.abs(sy);
+        if (! mode.moveTo(position, target, SPEED)) {
+            stayCounter = STAY_COUNT;
+        } else if (getHP() < getHPMax()) {
+            changeHP(HEALING);
+        } else if (stayCounter > 0) {
+            stayCounter--;
+        } else {
+            game.removeSprite(this);
         }
     }
 

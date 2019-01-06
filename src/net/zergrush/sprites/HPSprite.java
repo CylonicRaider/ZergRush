@@ -25,4 +25,16 @@ public abstract class HPSprite extends Sprite {
         bar.setHP(value);
     }
 
+    public double getHP() {
+        return bar.getHP();
+    }
+
+    public double getHPMax() {
+        return bar.getHPMax();
+    }
+
+    public void changeHP(double increment) {
+        bar.changeHP(increment);
+    }
+
 }
