@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.zergrush.sprites.Base;
 import net.zergrush.sprites.HPSprite;
@@ -134,6 +135,38 @@ public class Game {
         if (base != null) base.getHPBar().draw(g);
         for (Zerg z : zergs) z.getHPBar().draw(g);
         if (player != null) player.getHPBar().draw(g);
+    }
+
+    private <T extends Sprite> List<T> getIntersectingSingle(Sprite test,
+                                                             T reference) {
+        if (reference != null &&
+                test.getBounds().intersects(reference.getBounds())) {
+            return Collections.singletonList(reference);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Sprite> List<T> getIntersecting(Sprite spr,
+                                                      Class<T> other) {
+        if (other == Base.class) {
+            return (List<T>) getIntersectingSingle(spr, base);
+        } else if (other == Player.class) {
+            return (List<T>) getIntersectingSingle(spr, player);
+        } else if (other == Zerg.class) {
+            Rectangle2D bounds = spr.getBounds();
+            List<Zerg> ret = null;
+            for (Zerg z : zergs) {
+                if (bounds.intersects(z.getBounds())) {
+                    if (ret == null) ret = new ArrayList<Zerg>();
+                    ret.add(z);
+                }
+            }
+            return (List<T>) ret;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public void removeSprite(Sprite spr) {
