@@ -13,6 +13,7 @@ public class Player extends ShapeSprite {
     public enum Orientation { RIGHT, DOWN, LEFT, UP }
 
     public static final double HITPOINTS = 50;
+    public static final double ATTACK = 1;
     public static final double SIZE = 0.2;
     public static final double SPEED = 0.025;
     public static final double BOUND = 0.8;
@@ -74,6 +75,7 @@ public class Player extends ShapeSprite {
         } else if (game.isKeyPressed(KeyEvent.VK_RIGHT)) {
             move(Orientation.RIGHT);
         }
+        battleWith(Zerg.class, ATTACK);
     }
 
 }

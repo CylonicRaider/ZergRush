@@ -40,6 +40,8 @@ public class Zerg extends HPSprite {
     public void updateSelf() {
         if (! mode.moveTo(position, target, SPEED)) {
             stayCounter = STAY_COUNT;
+            battleWith(Base.class, ATTACK);
+            battleWith(Player.class, ATTACK);
         } else if (getHP() < getHPMax()) {
             changeHP(HEALING);
         } else if (stayCounter > 0) {

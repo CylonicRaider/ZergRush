@@ -9,6 +9,8 @@ import net.zergrush.Game;
 public class Base extends ShapeSprite {
 
     public static final double HITPOINTS = 250;
+    public static final double ATTACK = 1;
+    public static final double PLAYER_HEALING = 1;
     public static final double SIZE = 0.5;
     public static final Color COLOR = new Color(0x000080);
     public static final Shape SHAPE;
@@ -23,6 +25,9 @@ public class Base extends ShapeSprite {
         initHP(HITPOINTS);
     }
 
-    public void updateSelf() {}
+    public void updateSelf() {
+        battleWith(Zerg.class, ATTACK);
+        addHealth(Player.class, PLAYER_HEALING);
+    }
 
 }

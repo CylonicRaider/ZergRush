@@ -163,6 +163,7 @@ public class Game {
                     ret.add(z);
                 }
             }
+            if (ret == null) ret = Collections.emptyList();
             return (List<T>) ret;
         } else {
             return Collections.emptyList();

@@ -1,6 +1,7 @@
 package net.zergrush.sprites;
 
 import java.awt.geom.Point2D;
+import java.util.List;
 import net.zergrush.Game;
 
 public abstract class HPSprite extends Sprite {
@@ -35,6 +36,20 @@ public abstract class HPSprite extends Sprite {
 
     public void changeHP(double increment) {
         bar.changeHP(increment);
+    }
+
+    protected <T extends HPSprite> void addHealth(Class<T> cls,
+                                                  double strength) {
+        List<T> intersecting = game.getIntersecting(this, cls);
+        for (T other : intersecting) {
+            other.changeHP(strength);
+            if (other.getHP() == 0) game.removeSprite(other);
+        }
+    }
+
+    protected <T extends HPSprite> void battleWith(Class<T> cls,
+                                                   double strength) {
+        addHealth(cls, -strength);
     }
 
 }
