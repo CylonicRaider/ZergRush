@@ -10,23 +10,53 @@ import net.zergrush.sprites.Zerg;
 
 public class Game {
 
+    public enum State { INTRO, PLAYING, OVER };
+
     public static final int UPDATE_INTERVAL = 16;
 
     private final GameUI ui;
+    private State state;
     private Base base;
     private Player player;
-    private Zerg demoZerg;
 
     public Game(GameUI ui) {
         this.ui = ui;
-        this.base = new Base(this, null);
-        this.player = new Player(this, null);
-        this.demoZerg = new Zerg(this, null);
+        this.base = null;
+        this.player = null;
+        initUI();
+    }
+
+    protected void initUI() {
         ui.setGame(this);
+        setState(State.INTRO);
     }
 
     public GameUI getUI() {
         return ui;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State s) {
+        if (s == state) return;
+        state = s;
+        switch (s) {
+            case INTRO:
+                ui.setMessage("ZERG RUSH", "They are coming...");
+                break;
+            case PLAYING:
+                ui.setMessage(null, null);
+                base = new Base(this, null);
+                player = new Player(this, null);
+                break;
+            case OVER:
+                ui.setMessage("GAME OVER", null);
+                base = null;
+                player = null;
+                break;
+        }
     }
 
     private void updateSprite(Sprite spr) {
@@ -38,31 +68,24 @@ public class Game {
         spr.getHPBar().update();
     }
 
-    public void update() {
+    public boolean update() {
+        if (isKeyPressed(KeyEvent.VK_ESCAPE))
+            return false;
+        if (state != State.PLAYING && isKeyPressedFirst(KeyEvent.VK_ENTER))
+            setState(State.PLAYING);
         updateSprite(base);
         updateSprite(player);
-        updateSprite(demoZerg);
         updateHPBar(base);
         updateHPBar(player);
-        updateHPBar(demoZerg);
         ui.update();
+        return true;
     }
 
     public void draw(Graphics2D g) {
         if (base != null) base.draw(g);
-        if (demoZerg != null) demoZerg.draw(g);
         if (player != null) player.draw(g);
         if (base != null) base.getHPBar().draw(g);
-        if (demoZerg != null) demoZerg.getHPBar().draw(g);
         if (player != null) player.getHPBar().draw(g);
-    }
-
-    public Runnable getUpdateRunnable() {
-        return new Runnable() {
-            public void run() {
-                update();
-            }
-        };
     }
 
     public boolean isKeyPressed(int keyCode) {

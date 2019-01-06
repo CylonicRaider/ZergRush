@@ -1,5 +1,7 @@
 package net.zergrush;
 
+import java.awt.event.WindowEvent;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import net.zergrush.ui.MainUI;
 
@@ -9,11 +11,25 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 MainUI ui = new MainUI();
-                Game game = new Game(ui);
-                ui.setMessage("ZERG RUSH", "They are coming...");
-                MainUI.createWindow(ui).setVisible(true);
-                MainUI.scheduleRepeatedly(game.getUpdateRunnable(),
-                                      Game.UPDATE_INTERVAL);
+                final Game game = new Game(ui);
+                final JFrame win = MainUI.createWindow(ui);
+                win.setVisible(true);
+                MainUI.scheduleRepeatedly(new Runnable() {
+
+                    boolean running = true;
+
+                    public void run() {
+                        if (! running)
+                            return;
+                        if (! game.update()) {
+                            // Actually invoke the DefaultCloseOperation.
+                            win.dispatchEvent(new WindowEvent(win,
+                                WindowEvent.WINDOW_CLOSING));
+                            running = false;
+                        }
+                    }
+
+                }, Game.UPDATE_INTERVAL);
             }
         });
     }
