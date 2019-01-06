@@ -18,24 +18,24 @@ public class Game {
     public enum State { INTRO, PLAYING, OVER };
 
     public static final int UPDATE_INTERVAL = 16;
-    public static final int INITIAL_ZERG_COUNT = 1;
-    public static final int ZERG_COUNT_INCR_COUNTER = 60;
+    public static final double ZERG_SPAWN_COUNTER = 60;
+    public static final double ZERG_SPAWN_COUNTER_DECR = 0.995;
 
     private final GameUI ui;
     private State state;
     private Base base;
     private Player player;
     private final List<Zerg> zergs;
-    private int zergCount;
-    private int zergCountCounter;
+    private int zergSpawnCounter;
+    private double nextZergSpawnCounter;
 
     public Game(GameUI ui) {
         this.ui = ui;
         this.base = null;
         this.player = null;
         this.zergs = new ArrayList<>();
-        this.zergCount = INITIAL_ZERG_COUNT;
-        this.zergCountCounter = ZERG_COUNT_INCR_COUNTER;
+        this.zergSpawnCounter = 0;
+        this.nextZergSpawnCounter = ZERG_SPAWN_COUNTER;
         initUI();
     }
 
@@ -64,8 +64,8 @@ public class Game {
                 base = new Base(this, null);
                 player = new Player(this, null);
                 zergs.clear();
-                zergCount = INITIAL_ZERG_COUNT;
-                zergCountCounter = ZERG_COUNT_INCR_COUNTER;
+                zergSpawnCounter = 0;
+                nextZergSpawnCounter = ZERG_SPAWN_COUNTER;
                 break;
             case OVER:
                 ui.setMessage("GAME OVER", "Return \u2014 retry; Escape " +
@@ -114,19 +114,14 @@ public class Game {
         updateSprite(player);
         /* Spawn new zergs as necessary */
         if (state == State.PLAYING) {
-            if (zergCountCounter-- <= 0) {
-                zergCount++;
-                zergCountCounter = ZERG_COUNT_INCR_COUNTER;
-            }
-            if (zergs.size() < zergCount) {
-                Point2D position = new Point2D.Double();
-                while (zergs.size() < zergCount) {
-                    position.setLocation(Math.random() * 2 - 1,
-                                         (Math.random() < 0.5) ? -1 : 1);
-                    if (Math.random() < 0.5)
-                        position.setLocation(position.getY(), position.getX());
-                    zergs.add(new Zerg(this, position));
-                }
+            if (zergSpawnCounter-- <= 0) {
+                zergSpawnCounter = (int) nextZergSpawnCounter;
+                nextZergSpawnCounter *= ZERG_SPAWN_COUNTER_DECR;
+                Point2D position = new Point2D.Double(Math.random() * 2 - 1,
+                    (Math.random() < 0.5) ? -1 : 1);
+                if (Math.random() < 0.5)
+                    position.setLocation(position.getY(), position.getX());
+                zergs.add(new Zerg(this, position));
             }
             if (player == null || base == null) setState(State.OVER);
         }
