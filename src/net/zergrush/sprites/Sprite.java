@@ -21,6 +21,10 @@ public abstract class Sprite {
         return game;
     }
 
+    public Point2D getPosition() {
+        return position;
+    }
+
     public Rectangle2D getBounds() {
         return new Rectangle2D.Double(position.x + baseBounds.x,
             position.y + baseBounds.y, baseBounds.width, baseBounds.height);
