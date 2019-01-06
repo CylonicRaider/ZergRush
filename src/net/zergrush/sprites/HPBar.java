@@ -65,9 +65,8 @@ public class HPBar extends Sprite {
         g.fill(scratchRect);
     }
 
-    protected boolean updateSelf() {
+    protected void updateSelf() {
         updateLocation();
-        return true;
     }
 
     protected void updateLocation() {

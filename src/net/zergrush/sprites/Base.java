@@ -23,8 +23,6 @@ public class Base extends ShapeSprite {
         initHP(HITPOINTS);
     }
 
-    public boolean updateSelf() {
-        return true;
-    }
+    public void updateSelf() {}
 
 }

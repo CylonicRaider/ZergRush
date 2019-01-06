@@ -28,13 +28,12 @@ public abstract class Sprite {
 
     public abstract void draw(Graphics2D g);
 
-    public boolean update() {
+    public void update() {
         game.getUI().markDamaged(getBounds());
-        boolean ret = updateSelf();
-        if (ret) game.getUI().markDamaged(getBounds());
-        return ret;
+        updateSelf();
+        game.getUI().markDamaged(getBounds());
     }
 
-    protected abstract boolean updateSelf();
+    protected abstract void updateSelf();
 
 }

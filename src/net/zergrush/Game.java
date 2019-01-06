@@ -29,9 +29,9 @@ public class Game {
         return ui;
     }
 
-    private boolean updateSprite(Sprite spr) {
-        if (spr == null) return true;
-        return spr.update();
+    private void updateSprite(Sprite spr) {
+        if (spr == null) return;
+        spr.update();
     }
     private void updateHPBar(HPSprite spr) {
         if (spr == null || spr.getHPBar() == null) return;
@@ -39,9 +39,9 @@ public class Game {
     }
 
     public void update() {
-        if (! updateSprite(base)) base = null;
-        if (! updateSprite(player)) player = null;
-        if (! updateSprite(demoZerg)) demoZerg = null;
+        updateSprite(base);
+        updateSprite(player);
+        updateSprite(demoZerg);
         updateHPBar(base);
         updateHPBar(player);
         updateHPBar(demoZerg);

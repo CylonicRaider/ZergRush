@@ -64,7 +64,7 @@ public class Player extends ShapeSprite {
         super.drawSelf(g);
     }
 
-    public boolean updateSelf() {
+    public void updateSelf() {
         if (game.isKeyPressed(KeyEvent.VK_UP)) {
             move(Orientation.UP);
         } else if (game.isKeyPressed(KeyEvent.VK_DOWN)) {
@@ -74,7 +74,6 @@ public class Player extends ShapeSprite {
         } else if (game.isKeyPressed(KeyEvent.VK_RIGHT)) {
             move(Orientation.RIGHT);
         }
-        return true;
     }
 
 }

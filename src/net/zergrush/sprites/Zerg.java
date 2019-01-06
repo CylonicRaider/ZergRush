@@ -28,7 +28,7 @@ public class Zerg extends HPSprite {
         g.fill(getBounds());
     }
 
-    public boolean updateSelf() {
+    public void updateSelf() {
         position.setLocation(position.x + sx, position.y + sy);
         // We will replace this with homing toward the base once the latter is
         // implemented.
@@ -42,7 +42,6 @@ public class Zerg extends HPSprite {
         } else if (position.y >= 1) {
             sy = -Math.abs(sy);
         }
-        return true;
     }
 
 }
