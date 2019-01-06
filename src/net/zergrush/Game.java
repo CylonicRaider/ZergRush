@@ -57,7 +57,7 @@ public class Game {
         state = s;
         switch (s) {
             case INTRO:
-                ui.setMessage("ZERG RUSH", "They are coming...");
+                ui.setMessage("ZERG RUSH", "Press Return to start");
                 break;
             case PLAYING:
                 ui.setMessage(null, null);
@@ -68,7 +68,8 @@ public class Game {
                 zergCountCounter = ZERG_COUNT_INCR_COUNTER;
                 break;
             case OVER:
-                ui.setMessage("GAME OVER", null);
+                ui.setMessage("GAME OVER", "Return \u2014 retry; Escape " +
+                    "\u2014 quit");
                 base = null;
                 player = null;
                 break;
@@ -112,19 +113,22 @@ public class Game {
         updateSpriteList(zergs);
         updateSprite(player);
         /* Spawn new zergs as necessary */
-        if (zergCountCounter-- <= 0) {
-            zergCount++;
-            zergCountCounter = ZERG_COUNT_INCR_COUNTER;
-        }
-        if (zergs.size() < zergCount && (base != null || player != null)) {
-            Point2D position = new Point2D.Double();
-            while (zergs.size() < zergCount) {
-                position.setLocation(Math.random() * 2 - 1,
-                                     (Math.random() < 0.5) ? -1 : 1);
-                if (Math.random() < 0.5)
-                    position.setLocation(position.getY(), position.getX());
-                zergs.add(new Zerg(this, position));
+        if (state == State.PLAYING) {
+            if (zergCountCounter-- <= 0) {
+                zergCount++;
+                zergCountCounter = ZERG_COUNT_INCR_COUNTER;
             }
+            if (zergs.size() < zergCount) {
+                Point2D position = new Point2D.Double();
+                while (zergs.size() < zergCount) {
+                    position.setLocation(Math.random() * 2 - 1,
+                                         (Math.random() < 0.5) ? -1 : 1);
+                    if (Math.random() < 0.5)
+                        position.setLocation(position.getY(), position.getX());
+                    zergs.add(new Zerg(this, position));
+                }
+            }
+            if (player == null || base == null) setState(State.OVER);
         }
         /* Update UI; done */
         ui.update();
