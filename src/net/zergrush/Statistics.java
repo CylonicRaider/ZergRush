@@ -1,5 +1,6 @@
 package net.zergrush;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -87,6 +88,10 @@ public class Statistics {
         @SuppressWarnings("unchecked")
         Entry<T> ret = (Entry<T>) data.get(key);
         return ret;
+    }
+
+    public Collection<Entry<?>> entries() {
+        return data.values();
     }
 
     public <T> void init(Key<T> key, String description, T value) {
