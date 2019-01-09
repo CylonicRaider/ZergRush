@@ -2,9 +2,17 @@ package net.zergrush;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Statistics {
+
+    public interface ChangeListener<T> {
+
+        void valueChanged(Entry<T> ent);
+
+    }
 
     public static class Key<T> {
 
@@ -41,19 +49,25 @@ public class Statistics {
 
     }
 
-    public static class Entry<T> {
+    public class Entry<T> {
 
         private final Key<T> key;
         private String description;
         private T value;
+        private final List<ChangeListener<T>> listeners;
 
         public Entry(Key<T> key, String description, T value) {
             this.key = key;
             this.description = description;
             this.value = key.getType().cast(value);
+            this.listeners = new CopyOnWriteArrayList<>();
         }
         public Entry(Key<T> key, T value) {
             this(key, null, value);
+        }
+
+        public Statistics getParent() {
+            return Statistics.this;
         }
 
         public Key<T> getKey() {
@@ -74,6 +88,21 @@ public class Statistics {
 
         public void setValue(T value) {
             value = key.getType().cast(value);
+            fireChangeEvent();
+        }
+
+        public void addListener(ChangeListener<T> l) {
+            listeners.add(l);
+        }
+
+        public void removeListener(ChangeListener<T> l) {
+            listeners.remove(l);
+        }
+
+        protected void fireChangeEvent() {
+            for (ChangeListener<T> l : listeners) {
+                l.valueChanged(this);
+            }
         }
 
     }
