@@ -58,7 +58,8 @@ public class Zerg extends HPSprite {
 
     public void die(HPSprite victor) {
         super.die(victor);
-        game.getStats().increment(GameStatistics.SCORE, DEATH_POINTS);
+        if (victor instanceof Player)
+            game.getStats().increment(GameStatistics.SCORE, DEATH_POINTS);
     }
 
 }
