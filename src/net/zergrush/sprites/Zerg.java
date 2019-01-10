@@ -4,12 +4,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import net.zergrush.Game;
+import net.zergrush.GameStatistics;
 
 public class Zerg extends HPSprite {
 
     public static final double HITPOINTS = 10;
     public static final double ATTACK = 1;
     public static final double HEALING = 1;
+    public static final int DEATH_POINTS = 5;
     public static final int STAY_COUNT = 5;
     public static final double SIZE = 0.15;
     public static final double SPEED = 0.005;
@@ -52,6 +54,11 @@ public class Zerg extends HPSprite {
         } else {
             game.removeSprite(this);
         }
+    }
+
+    public void die(HPSprite victor) {
+        super.die(victor);
+        game.getStats().increment(GameStatistics.SCORE, DEATH_POINTS);
     }
 
 }

@@ -22,6 +22,7 @@ public class Game {
     public static final double ZERG_SPAWN_COUNTER_DECR = 0.995;
 
     private final GameUI ui;
+    private final GameStatistics stats;
     private State state;
     private Base base;
     private Player player;
@@ -31,6 +32,7 @@ public class Game {
 
     public Game(GameUI ui) {
         this.ui = ui;
+        this.stats = new GameStatistics();
         this.base = null;
         this.player = null;
         this.zergs = new ArrayList<>();
@@ -48,6 +50,10 @@ public class Game {
         return ui;
     }
 
+    public Statistics getStats() {
+        return stats;
+    }
+
     public State getState() {
         return state;
     }
@@ -61,6 +67,7 @@ public class Game {
                 break;
             case PLAYING:
                 ui.setMessage(null, null);
+                stats.reset();
                 base = new Base(this, null);
                 player = new Player(this, null);
                 zergs.clear();

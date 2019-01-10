@@ -86,8 +86,8 @@ public class Statistics {
             return value;
         }
 
-        public void setValue(T value) {
-            value = key.getType().cast(value);
+        public void setValue(T v) {
+            value = key.getType().cast(v);
             fireChangeEvent();
         }
 
@@ -123,10 +123,12 @@ public class Statistics {
         return data.values();
     }
 
-    public <T> void init(Key<T> key, String description, T value) {
-        if (data.put(key, new Entry<T>(key, description, value)) != null)
+    public <T> Entry<T> init(Key<T> key, String description, T value) {
+        Entry<T> ent = new Entry<T>(key, description, value);
+        if (data.put(key, ent) != null)
             throw new IllegalStateException("Initializing already-existing " +
                 "entry for key " + key);
+        return ent;
     }
 
     public <T> T get(Key<T> key) {
