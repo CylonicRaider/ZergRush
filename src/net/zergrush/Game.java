@@ -50,7 +50,7 @@ public class Game {
         return ui;
     }
 
-    public Statistics getStats() {
+    public GameStatistics getStats() {
         return stats;
     }
 
@@ -81,6 +81,7 @@ public class Game {
                 player = null;
                 break;
         }
+        ui.onGameStateChange();
     }
 
     private void eraseSprite(Sprite spr) {

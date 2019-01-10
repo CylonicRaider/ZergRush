@@ -10,6 +10,8 @@ public interface GameUI {
 
     void setGame(Game game);
 
+    void onGameStateChange();
+
     void setMessage(String heading, String text);
 
     void markDamaged(Rectangle2D rect);

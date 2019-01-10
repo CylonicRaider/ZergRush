@@ -61,6 +61,10 @@ public class GameArea extends JComponent {
         fsListener = l;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
     public void setGame(Game g) {
         game = g;
     }

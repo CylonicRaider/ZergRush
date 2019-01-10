@@ -1,5 +1,6 @@
 package net.zergrush.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,9 +20,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import net.zergrush.Game;
 import net.zergrush.GameUI;
+import net.zergrush.GameStatistics;
+import net.zergrush.Statistics;
 
 public class MainUI extends JPanel implements GameUI,
-        GameArea.FontSizeListener {
+        GameArea.FontSizeListener, GameStatistics.ResetListener {
 
     protected class KeyTracker extends KeyAdapter {
 
@@ -38,12 +41,14 @@ public class MainUI extends JPanel implements GameUI,
     private final GameArea gameArea;
     private final JLabel headingMessage;
     private final JLabel textMessage;
+    private final JLabel scoreMessage;
     private final Map<Integer, Integer> keyStates;
 
     public MainUI() {
         gameArea = new GameArea();
         headingMessage = new JLabel();
         textMessage = new JLabel();
+        scoreMessage = new JLabel();
         keyStates = new HashMap<>();
         createUI();
     }
@@ -57,6 +62,7 @@ public class MainUI extends JPanel implements GameUI,
     protected void createUI() {
         setBackground(Color.WHITE);
         setLayout(new OverlayLayout(this));
+        addKeyListener(new KeyTracker());
 
         JPanel messageOverlay = new JPanel();
         messageOverlay.setLayout(new BoxLayout(messageOverlay,
@@ -73,10 +79,19 @@ public class MainUI extends JPanel implements GameUI,
         messageOverlay.setOpaque(false);
         add(messageOverlay);
 
+        JPanel scoreLayer = new JPanel();
+        scoreLayer.setLayout(new BorderLayout());
+
+        scoreMessage.setHorizontalAlignment(JLabel.RIGHT);
+        scoreMessage.setVerticalAlignment(JLabel.TOP);
+        scoreMessage.setForeground(Color.BLACK);
+        scoreLayer.add(scoreMessage);
+
+        scoreLayer.setOpaque(false);
+        add(scoreLayer);
+
         gameArea.setFSListener(this);
         add(gameArea);
-
-        addKeyListener(new KeyTracker());
 
         updateFonts();
     }
@@ -86,6 +101,7 @@ public class MainUI extends JPanel implements GameUI,
         headingMessage.setFont(baseFont.deriveFont(Font.BOLD)
             .deriveFont(2.0f * baseFont.getSize()));
         textMessage.setFont(baseFont.deriveFont(Font.ITALIC));
+        scoreMessage.setFont(baseFont.deriveFont(0.75f * baseFont.getSize()));
     }
 
     public void onFontSizeChanged(int newSize) {
@@ -97,8 +113,35 @@ public class MainUI extends JPanel implements GameUI,
         });
     }
 
+    public void onStatisticsReset(GameStatistics stats) {
+        stats.getEntry(GameStatistics.SCORE).addListener(
+            new Statistics.ChangeListener<Integer>() {
+                public void valueChanged(Statistics.Entry<Integer> ent) {
+                    updateScoreText();
+                }
+            }
+        );
+    }
+
+    private GameStatistics getStatistics() {
+        return gameArea.getGame().getStats();
+    }
+
     public void setGame(Game game) {
         gameArea.setGame(game);
+        game.getStats().addResetListener(this);
+    }
+
+    public void onGameStateChange() {
+        Game.State st = gameArea.getGame().getState();
+        switch (st) {
+            case PLAYING: case OVER:
+                updateScoreText();
+                break;
+            default:
+                scoreMessage.setText("");
+                break;
+        }
     }
 
     public void setMessage(String heading, String text) {
@@ -106,6 +149,11 @@ public class MainUI extends JPanel implements GameUI,
         if (heading != null) headingMessage.setText(heading);
         textMessage.setVisible(text != null);
         if (text != null) textMessage.setText(text);
+    }
+
+    protected void updateScoreText() {
+        int score = getStatistics().get(GameStatistics.SCORE);
+        scoreMessage.setText("Score: " + score);
     }
 
     public void markDamaged(Rectangle2D rect) {
