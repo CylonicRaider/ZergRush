@@ -148,6 +148,10 @@ public class Statistics {
         data.remove(key);
     }
 
+    public void clear() {
+        data.clear();
+    }
+
     public void increment(Key<Integer> key, int incr) {
         Entry<Integer> ent = getEntry(key);
         ent.setValue(ent.getValue() + incr);
