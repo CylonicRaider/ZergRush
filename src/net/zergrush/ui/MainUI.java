@@ -19,8 +19,8 @@ import javax.swing.OverlayLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import net.zergrush.Game;
-import net.zergrush.GameUI;
 import net.zergrush.GameStatistics;
+import net.zergrush.GameUI;
 import net.zergrush.Statistics;
 
 public class MainUI extends JPanel implements GameUI,

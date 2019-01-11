@@ -3,9 +3,9 @@ package net.zergrush.sprites;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.awt.event.KeyEvent;
 import java.util.List;
 import net.zergrush.Game;
 
