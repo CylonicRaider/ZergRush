@@ -29,6 +29,8 @@ public class GameArea extends JComponent {
 
     }
 
+    private static final long serialVersionUID = -5393846493473658297L;
+
     public static final double FONT_SIZE = 0.05;
     public static final Color BORDER_COLOR = new Color(0x404040);
 

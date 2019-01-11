@@ -38,6 +38,8 @@ public class MainUI extends JPanel implements GameUI,
 
     }
 
+    private static final long serialVersionUID = -2329967477365368049L;
+
     private final GameArea gameArea;
     private final JLabel headingMessage;
     private final JLabel textMessage;
