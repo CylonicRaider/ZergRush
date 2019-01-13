@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
 import javax.swing.SwingUtilities;
@@ -62,9 +63,13 @@ public class MainUI extends JPanel implements GameUI,
     }
 
     protected void createUI() {
-        setBackground(Color.WHITE);
-        setLayout(new OverlayLayout(this));
+        setBackground(GameArea.BORDER_COLOR);
+        setLayout(new SquareLayout());
         addKeyListener(new KeyTracker());
+
+        JPanel gameLayers = new JPanel();
+        gameLayers.setBackground(GameArea.BACKGROUND_COLOR);
+        gameLayers.setLayout(new OverlayLayout(gameLayers));
 
         JPanel messageOverlay = new JPanel();
         messageOverlay.setLayout(new BoxLayout(messageOverlay,
@@ -79,7 +84,7 @@ public class MainUI extends JPanel implements GameUI,
         messageOverlay.add(textMessage);
 
         messageOverlay.setOpaque(false);
-        add(messageOverlay);
+        gameLayers.add(messageOverlay);
 
         JPanel scoreLayer = new JPanel();
         scoreLayer.setLayout(new BorderLayout());
@@ -90,10 +95,12 @@ public class MainUI extends JPanel implements GameUI,
         scoreLayer.add(scoreMessage);
 
         scoreLayer.setOpaque(false);
-        add(scoreLayer);
+        gameLayers.add(scoreLayer);
 
         gameArea.setFSListener(this);
-        add(gameArea);
+        gameLayers.add(gameArea);
+
+        add(gameLayers);
 
         updateFonts();
     }
