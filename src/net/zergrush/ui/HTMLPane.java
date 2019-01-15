@@ -6,9 +6,13 @@ import java.net.URL;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.EditorKit;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 
-public class HTMLPane extends JPanel {
+public class HTMLPane extends JPanel implements HyperlinkListener {
 
     private static final long serialVersionUID = -1724213395749874932L;
 
@@ -24,6 +28,7 @@ public class HTMLPane extends JPanel {
     protected JEditorPane createContent() {
         JEditorPane ret = new JEditorPane("text/html", "");
         ret.setEditable(false);
+        ret.addHyperlinkListener(this);
         return ret;
     }
 
@@ -39,6 +44,20 @@ public class HTMLPane extends JPanel {
 
     public JEditorPane getContent() {
         return content;
+    }
+
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+        // Code adapted from JEditorPane docs.
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            JEditorPane pane = (JEditorPane) e.getSource();
+            if (e instanceof HTMLFrameHyperlinkEvent) {
+                HTMLFrameHyperlinkEvent  evt = (HTMLFrameHyperlinkEvent) e;
+                HTMLDocument doc = (HTMLDocument) pane.getDocument();
+                doc.processHTMLFrameHyperlinkEvent(evt);
+            } else {
+                loadPage(e.getURL());
+            }
+        }
     }
 
     protected void reset() {
