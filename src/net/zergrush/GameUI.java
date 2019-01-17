@@ -20,4 +20,6 @@ public interface GameUI {
 
     int getKeyStatus(int keyCode);
 
+    void showInfoScreen(String name);
+
 }

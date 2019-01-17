@@ -108,8 +108,12 @@ public class Game {
         /* Check for keyboard input */
         if (isKeyPressed(KeyEvent.VK_ESCAPE))
             return false;
-        if (state != State.PLAYING && isKeyPressedFirst(KeyEvent.VK_ENTER))
-            setState(State.PLAYING);
+        if (state != State.PLAYING) {
+            if (isKeyPressedFirst(KeyEvent.VK_ENTER))
+                setState(State.PLAYING);
+            if (isKeyPressedFirst(KeyEvent.VK_F1))
+                ui.showInfoScreen("intro");
+        }
         /* Erase sprites
          * This has to happen before the updating pass because some HP bars
          * might be missed otherwise. */

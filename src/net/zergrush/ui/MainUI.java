@@ -2,13 +2,16 @@ package net.zergrush.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.BoxLayout;
@@ -46,6 +49,7 @@ public class MainUI extends JPanel implements GameUI,
     private final JLabel textMessage;
     private final JLabel scoreMessage;
     private final Map<Integer, Integer> keyStates;
+    private HTMLDialog dialog;
 
     public MainUI() {
         gameArea = new GameArea();
@@ -53,6 +57,7 @@ public class MainUI extends JPanel implements GameUI,
         textMessage = new JLabel();
         scoreMessage = new JLabel();
         keyStates = new HashMap<>();
+        dialog = null;
         createUI();
     }
 
@@ -113,6 +118,16 @@ public class MainUI extends JPanel implements GameUI,
         scoreMessage.setFont(baseFont.deriveFont(0.75f * baseFont.getSize()));
     }
 
+    public HTMLDialog getHTMLDialog() {
+        if (dialog == null) {
+            dialog = new HTMLDialog(getWindow(this));
+            dialog.getDisplay().setPreferredSize(getSize());
+            dialog.pack();
+            dialog.setLocationRelativeTo(dialog.getOwner());
+        }
+        return dialog;
+    }
+
     public void onFontSizeChanged(int newSize) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -130,10 +145,6 @@ public class MainUI extends JPanel implements GameUI,
                 }
             }
         );
-    }
-
-    private GameStatistics getStatistics() {
-        return gameArea.getGame().getStats();
     }
 
     public void setGame(Game game) {
@@ -160,6 +171,10 @@ public class MainUI extends JPanel implements GameUI,
         if (text != null) textMessage.setText(text);
     }
 
+    private GameStatistics getStatistics() {
+        return gameArea.getGame().getStats();
+    }
+
     protected void updateScoreText() {
         int score = getStatistics().get(GameStatistics.SCORE);
         scoreMessage.setText("Score: " + score);
@@ -182,6 +197,16 @@ public class MainUI extends JPanel implements GameUI,
         return ret;
     }
 
+    public void showInfoScreen(String name) {
+        showInfoScreen(getClass().getResource("/res/" + name + ".html"));
+    }
+
+    public void showInfoScreen(URL url) {
+        HTMLDialog d = getHTMLDialog();
+        d.loadPage(url);
+        d.setVisible(true);
+    }
+
     // While this is not strictly not a responsibility of the UI, Swing likes
     // to have timers its own way anyway.
     public static void scheduleRepeatedly(final Runnable r, int delay) {
@@ -190,6 +215,15 @@ public class MainUI extends JPanel implements GameUI,
                 r.run();
             }
         }).start();
+    }
+
+    private static Window getWindow(Component comp) {
+        while (comp != null) {
+            if (comp instanceof Window)
+                return (Window) comp;
+            comp = comp.getParent();
+        }
+        return null;
     }
 
     public static JFrame createWindow(MainUI ui) {
