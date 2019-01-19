@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.HashMap;
@@ -17,7 +18,6 @@ import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
 import javax.swing.SwingUtilities;
@@ -224,6 +224,11 @@ public class MainUI extends JPanel implements GameUI,
             comp = comp.getParent();
         }
         return null;
+    }
+
+    public static void closeWindow(Window win) {
+        // This ensures that a JFrame's DefaultCloseOperation is invoked.
+        win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
     }
 
     public static JFrame createWindow(MainUI ui) {

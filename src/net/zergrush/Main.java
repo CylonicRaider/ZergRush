@@ -1,6 +1,5 @@
 package net.zergrush;
 
-import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import net.zergrush.ui.MainUI;
@@ -22,9 +21,7 @@ public class Main {
                         if (! running)
                             return;
                         if (! game.update()) {
-                            // Actually invoke the DefaultCloseOperation.
-                            win.dispatchEvent(new WindowEvent(win,
-                                WindowEvent.WINDOW_CLOSING));
+                            MainUI.closeWindow(win);
                             running = false;
                         }
                     }
