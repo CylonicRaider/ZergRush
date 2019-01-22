@@ -42,6 +42,7 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         ret.setEditable(false);
         ret.addHyperlinkListener(this);
         ret.addPropertyChangeListener(this);
+        ret.putClientProperty(JEditorPane.W3C_LENGTH_UNITS, Boolean.TRUE);
         return ret;
     }
 
