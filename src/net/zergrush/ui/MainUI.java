@@ -155,7 +155,7 @@ public class MainUI extends JPanel implements GameUI,
     public void onGameStateChange() {
         Game.State st = gameArea.getGame().getState();
         switch (st) {
-            case PLAYING: case OVER:
+            case PLAYING: case PAUSED: case OVER:
                 updateScoreText();
                 break;
             default:

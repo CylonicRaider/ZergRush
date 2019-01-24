@@ -125,6 +125,10 @@ public class GameArea extends JComponent {
     }
 
     public void markDamaged(Rectangle2D rect) {
+        if (rect == null) {
+            repaint();
+            return;
+        }
         calculateGameArea();
         final double[] coords = { rect.getX(), rect.getY(),
             rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight() };

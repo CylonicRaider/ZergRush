@@ -15,7 +15,7 @@ import net.zergrush.sprites.Zerg;
 
 public class Game {
 
-    public enum State { INTRO, PLAYING, OVER };
+    public enum State { INTRO, PLAYING, PAUSED, OVER };
 
     public static final int UPDATE_INTERVAL = 16;
     public static final double ZERG_SPAWN_COUNTER = 60;
@@ -60,6 +60,7 @@ public class Game {
 
     public void setState(State s) {
         if (s == state) return;
+        State prevState = state;
         state = s;
         switch (s) {
             case INTRO:
@@ -67,21 +68,30 @@ public class Game {
                 break;
             case PLAYING:
                 ui.setMessage(null, null);
-                stats.reset();
-                base = new Base(this, null);
-                player = new Player(this, null);
-                zergs.clear();
-                zergSpawnCounter = 0;
-                nextZergSpawnCounter = ZERG_SPAWN_COUNTER;
+                if (prevState != State.PAUSED) reset();
+                break;
+            case PAUSED:
+                ui.setMessage("PAUSED", null);
                 break;
             case OVER:
                 ui.setMessage("GAME OVER", "Return \u2014 retry; Escape " +
                     "\u2014 quit");
                 base = null;
                 player = null;
+                ui.markDamaged(null);
                 break;
         }
         ui.onGameStateChange();
+    }
+
+    protected void reset() {
+        stats.reset();
+        base = new Base(this, null);
+        player = new Player(this, null);
+        zergs.clear();
+        zergSpawnCounter = 0;
+        nextZergSpawnCounter = ZERG_SPAWN_COUNTER;
+        ui.markDamaged(null);
     }
 
     private void eraseSprite(Sprite spr) {
@@ -106,36 +116,49 @@ public class Game {
 
     public boolean update() {
         /* Check for keyboard input */
-        if (isKeyPressed(KeyEvent.VK_ESCAPE))
+        if (isKeyPressed(KeyEvent.VK_ESCAPE)) {
             return false;
-        if (state != State.PLAYING) {
-            if (isKeyPressedFirst(KeyEvent.VK_ENTER))
-                setState(State.PLAYING);
-            if (isKeyPressedFirst(KeyEvent.VK_F1))
-                ui.showInfoScreen("intro");
         }
-        /* Erase sprites
-         * This has to happen before the updating pass because some HP bars
-         * might be missed otherwise. */
-        eraseSprite(base);
-        for (Zerg z : zergs) eraseSprite(z);
-        eraseSprite(player);
-        /* Update sprites */
-        updateSprite(base);
-        updateSpriteList(zergs);
-        updateSprite(player);
-        /* Spawn new zergs as necessary */
-        if (state == State.PLAYING) {
-            if (zergSpawnCounter-- <= 0) {
-                zergSpawnCounter = (int) nextZergSpawnCounter;
-                nextZergSpawnCounter *= ZERG_SPAWN_COUNTER_DECR;
-                Point2D position = new Point2D.Double(Math.random() * 2 - 1,
-                    (Math.random() < 0.5) ? -1 : 1);
-                if (Math.random() < 0.5)
-                    position.setLocation(position.getY(), position.getX());
-                zergs.add(new Zerg(this, position));
+        if (isKeyPressedFirst(KeyEvent.VK_F1)) {
+            if (state == State.PLAYING) setState(State.PAUSED);
+            ui.showInfoScreen("intro");
+        }
+        if (isKeyPressedFirst(KeyEvent.VK_PAUSE)) {
+            if (state == State.PLAYING) {
+                setState(State.PAUSED);
+            } else if (state == State.PAUSED) {
+                setState(State.PLAYING);
             }
-            if (player == null || base == null) setState(State.OVER);
+        }
+        if (isKeyPressedFirst(KeyEvent.VK_ENTER)) {
+            setState(State.PLAYING);
+        }
+        if (state == State.PLAYING) {
+            /* Erase sprites
+             * This has to happen before the updating pass because some HP bars
+             * might be missed otherwise. */
+            eraseSprite(base);
+            for (Zerg z : zergs) eraseSprite(z);
+            eraseSprite(player);
+            /* Update sprites */
+            updateSprite(base);
+            updateSpriteList(zergs);
+            updateSprite(player);
+            /* Spawn new zergs as necessary */
+            if (state == State.PLAYING) {
+                if (zergSpawnCounter-- <= 0) {
+                    zergSpawnCounter = (int) nextZergSpawnCounter;
+                    nextZergSpawnCounter *= ZERG_SPAWN_COUNTER_DECR;
+                    Point2D position = new Point2D.Double(
+                        Math.random() * 2 - 1,
+                        (Math.random() < 0.5) ? -1 : 1);
+                    if (Math.random() < 0.5)
+                        position.setLocation(position.getY(),
+                                             position.getX());
+                    zergs.add(new Zerg(this, position));
+                }
+                if (player == null || base == null) setState(State.OVER);
+            }
         }
         /* Update UI; done */
         ui.update();
