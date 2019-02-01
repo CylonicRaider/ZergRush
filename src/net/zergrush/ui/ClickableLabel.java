@@ -1,10 +1,13 @@
 package net.zergrush.ui;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.TextAttribute;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JLabel;
 
@@ -64,6 +67,23 @@ public class ClickableLabel extends JLabel {
     private void fireActionEvent(MouseEvent source) {
         fireActionEvent(new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
             actionCommand, source.getWhen(), source.getModifiers()));
+    }
+
+    public boolean isUnderlined() {
+        Font font = getFont();
+        Map<TextAttribute, ?> attrs = font.getAttributes();
+        Object value = attrs.get(TextAttribute.UNDERLINE);
+        return (value instanceof Boolean) ? (Boolean) value : false;
+    }
+
+    public void setUnderlined(boolean underline) {
+        Font font = getFont();
+        // That API design is wonderful.
+        @SuppressWarnings("unchecked")
+        Map<TextAttribute, Object> attrs =
+            (Map<TextAttribute, Object>) font.getAttributes();
+        attrs.put(TextAttribute.UNDERLINE, (Object) underline);
+        setFont(font.deriveFont(attrs));
     }
 
 }
