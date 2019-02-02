@@ -73,7 +73,7 @@ public class ClickableLabel extends JLabel {
         Font font = getFont();
         Map<TextAttribute, ?> attrs = font.getAttributes();
         Object value = attrs.get(TextAttribute.UNDERLINE);
-        return (value instanceof Boolean) ? (Boolean) value : false;
+        return TextAttribute.UNDERLINE_ON.equals(value);
     }
 
     public void setUnderlined(boolean underline) {
@@ -82,7 +82,9 @@ public class ClickableLabel extends JLabel {
         @SuppressWarnings("unchecked")
         Map<TextAttribute, Object> attrs =
             (Map<TextAttribute, Object>) font.getAttributes();
-        attrs.put(TextAttribute.UNDERLINE, (Object) underline);
+        // There is, of course, no constant for *no* underline.
+        attrs.put(TextAttribute.UNDERLINE,
+            (underline ? TextAttribute.UNDERLINE_ON : -1));
         setFont(font.deriveFont(attrs));
     }
 
