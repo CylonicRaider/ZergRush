@@ -1,5 +1,6 @@
 package net.zergrush.ui;
 
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,10 +33,15 @@ public class ClickableLabel extends JLabel {
     public ClickableLabel(String text) {
         super(text);
         listeners = new CopyOnWriteArrayList<>();
-        addMouseListener(new MouseTracker());
+        createUI();
     }
     public ClickableLabel() {
         this(null);
+    }
+
+    protected void createUI() {
+        addMouseListener(new MouseTracker());
+        setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 
     public String getActionCommand() {
