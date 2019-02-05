@@ -4,7 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,16 +19,17 @@ import java.awt.geom.Rectangle2D;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.OverlayLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import net.zergrush.Game;
 import net.zergrush.GameStatistics;
 import net.zergrush.GameUI;
+import net.zergrush.KeyboardAction;
 import net.zergrush.Statistics;
 
 public class MainUI extends JPanel implements GameUI,
@@ -46,7 +51,7 @@ public class MainUI extends JPanel implements GameUI,
 
     private final GameArea gameArea;
     private final JLabel headingMessage;
-    private final JLabel textMessage;
+    private final JPanel actionPanel;
     private final JLabel scoreMessage;
     private final Map<Integer, Integer> keyStates;
     private HTMLDialog dialog;
@@ -54,7 +59,7 @@ public class MainUI extends JPanel implements GameUI,
     public MainUI() {
         gameArea = new GameArea();
         headingMessage = new JLabel();
-        textMessage = new JLabel();
+        actionPanel = new JPanel();
         scoreMessage = new JLabel();
         keyStates = new HashMap<>();
         dialog = null;
@@ -77,16 +82,16 @@ public class MainUI extends JPanel implements GameUI,
         gameLayers.setLayout(new OverlayLayout(gameLayers));
 
         JPanel messageOverlay = new JPanel();
-        messageOverlay.setLayout(new BoxLayout(messageOverlay,
-                                               BoxLayout.Y_AXIS));
+        messageOverlay.setLayout(new GridLayout(2, 1));
 
-        headingMessage.setAlignmentX(CENTER_ALIGNMENT);
+        headingMessage.setHorizontalAlignment(JLabel.CENTER);
+        headingMessage.setVerticalAlignment(JLabel.BOTTOM);
         headingMessage.setForeground(Color.BLACK);
         messageOverlay.add(headingMessage);
 
-        textMessage.setAlignmentX(CENTER_ALIGNMENT);
-        textMessage.setForeground(Color.BLACK);
-        messageOverlay.add(textMessage);
+        actionPanel.setLayout(new FlowLayout());
+        actionPanel.setOpaque(false);
+        messageOverlay.add(actionPanel);
 
         messageOverlay.setOpaque(false);
         gameLayers.add(messageOverlay);
@@ -114,8 +119,17 @@ public class MainUI extends JPanel implements GameUI,
         Font baseFont = getBaseFont();
         headingMessage.setFont(baseFont.deriveFont(Font.BOLD)
             .deriveFont(2.0f * baseFont.getSize()));
-        textMessage.setFont(baseFont.deriveFont(Font.ITALIC));
         scoreMessage.setFont(baseFont.deriveFont(0.75f * baseFont.getSize()));
+        Font labelFont = baseFont.deriveFont(Font.ITALIC);
+        for (Component comp : actionPanel.getComponents()) {
+            comp.setFont(labelFont);
+        }
+        Graphics g = getGraphics();
+        if (g == null) return;
+        FontMetrics metrics = g.getFontMetrics(labelFont);
+        FlowLayout layout = (FlowLayout) actionPanel.getLayout();
+        // This *should* be about 0.5em... if I use the API correctly.
+        layout.setHgap(Math.max(metrics.getHeight() / 2, 1));
     }
 
     public HTMLDialog getHTMLDialog() {
@@ -164,11 +178,31 @@ public class MainUI extends JPanel implements GameUI,
         }
     }
 
-    public void setMessage(String heading, String text) {
+    public void setMessage(String heading, KeyboardAction... actions) {
         headingMessage.setVisible(heading != null);
         if (heading != null) headingMessage.setText(heading);
-        textMessage.setVisible(text != null);
-        if (text != null) textMessage.setText(text);
+        actionPanel.removeAll();
+        final Font labelFont = getBaseFont().deriveFont(Font.ITALIC);
+        for (int i = 0; i < actions.length; i++) {
+            final KeyboardAction act = actions[i];
+            ClickableLabel label = new ClickableLabel(
+                act.getKeyDescription() + "\u2015" + act.getDescription());
+            label.setFont(labelFont);
+            label.setForeground(Color.BLACK);
+            label.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    KeyStroke ks = KeyStroke.getKeyStroke(act.getKey());
+                    final int keyCode = ks.getKeyCode();
+                    keyStates.put(keyCode, KEY_PRESSED_INITIAL);
+                    gameArea.getGame().runAfterNextUpdate(new Runnable() {
+                        public void run() {
+                            keyStates.remove(keyCode);
+                        }
+                    });
+                }
+            });
+            actionPanel.add(label);
+        }
     }
 
     private GameStatistics getStatistics() {

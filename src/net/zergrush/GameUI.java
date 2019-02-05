@@ -12,7 +12,7 @@ public interface GameUI {
 
     void onGameStateChange();
 
-    void setMessage(String heading, String text);
+    void setMessage(String heading, KeyboardAction... actions);
 
     void markDamaged(Rectangle2D rect);
 

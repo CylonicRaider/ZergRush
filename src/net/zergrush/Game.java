@@ -7,6 +7,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import net.zergrush.sprites.Base;
 import net.zergrush.sprites.HPSprite;
 import net.zergrush.sprites.Player;
@@ -23,6 +25,7 @@ public class Game {
 
     private final GameUI ui;
     private final GameStatistics stats;
+    private final Queue<Runnable> runQueue;
     private State state;
     private Base base;
     private Player player;
@@ -33,6 +36,7 @@ public class Game {
     public Game(GameUI ui) {
         this.ui = ui;
         this.stats = new GameStatistics();
+        this.runQueue = new ConcurrentLinkedQueue<>();
         this.base = null;
         this.player = null;
         this.zergs = new ArrayList<>();
@@ -54,6 +58,10 @@ public class Game {
         return stats;
     }
 
+    public void runAfterNextUpdate(Runnable r) {
+        runQueue.add(r);
+    }
+
     public State getState() {
         return state;
     }
@@ -64,18 +72,20 @@ public class Game {
         state = s;
         switch (s) {
             case INTRO:
-                ui.setMessage("ZERG RUSH", "Press Return to start");
+                ui.setMessage("ZERG RUSH",
+                    new KeyboardAction("Enter", "start"));
                 break;
             case PLAYING:
-                ui.setMessage(null, null);
+                ui.setMessage(null);
                 if (prevState != State.PAUSED) reset();
                 break;
             case PAUSED:
-                ui.setMessage("PAUSED", null);
+                ui.setMessage("PAUSED");
                 break;
             case OVER:
-                ui.setMessage("GAME OVER", "Return \u2014 retry; Escape " +
-                    "\u2014 quit");
+                ui.setMessage("GAME OVER",
+                    new KeyboardAction("Enter", "retry"),
+                    new KeyboardAction("Escape", "quit"));
                 base = null;
                 player = null;
                 ui.markDamaged(null);
@@ -159,6 +169,12 @@ public class Game {
                 }
                 if (player == null || base == null) setState(State.OVER);
             }
+        }
+        /* Drain run queue */
+        for (;;) {
+            Runnable r = runQueue.poll();
+            if (r == null) break;
+            r.run();
         }
         /* Update UI; done */
         ui.update();
