@@ -143,7 +143,7 @@ public class Game {
         if (isKeyPressedFirst(KeyEvent.VK_ENTER)) {
             setState(State.PLAYING);
         }
-        if (state == State.PLAYING) {
+        if (state == State.PLAYING || state == State.OVER) {
             /* Erase sprites
              * This has to happen before the updating pass because some HP bars
              * might be missed otherwise. */
