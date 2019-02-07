@@ -128,8 +128,8 @@ public class MainUI extends JPanel implements GameUI,
         if (g == null) return;
         FontMetrics metrics = g.getFontMetrics(labelFont);
         FlowLayout layout = (FlowLayout) actionPanel.getLayout();
-        // This *should* be about 0.5em... if I use the API correctly.
-        layout.setHgap(Math.max(metrics.getHeight() / 2, 1));
+        // This *should* be about 1em... if I use the API correctly.
+        layout.setHgap(Math.max(metrics.getHeight(), 1));
     }
 
     public HTMLDialog getHTMLDialog() {
@@ -186,7 +186,7 @@ public class MainUI extends JPanel implements GameUI,
         for (int i = 0; i < actions.length; i++) {
             final KeyboardAction act = actions[i];
             ClickableLabel label = new ClickableLabel(
-                act.getKeyDescription() + "\u2015" + act.getDescription());
+                act.getKeyDescription() + " \u2014 " + act.getDescription());
             label.setFont(labelFont);
             label.setForeground(Color.BLACK);
             label.addActionListener(new ActionListener() {
