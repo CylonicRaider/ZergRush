@@ -16,11 +16,19 @@ public class ClickableLabel extends JLabel {
 
     protected class MouseTracker extends MouseAdapter {
 
+        public void mouseEntered(MouseEvent evt) {
+            setUnderlined(true);
+        }
+
         public void mouseClicked(MouseEvent evt) {
             if (evt.getButton() == MouseEvent.BUTTON1 &&
                     evt.getClickCount() == 1) {
                 fireActionEvent(evt);
             }
+        }
+
+        public void mouseExited(MouseEvent evt) {
+            setUnderlined(false);
         }
 
     }
