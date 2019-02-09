@@ -21,11 +21,20 @@ public class ClickableLabel extends JLabel {
             setUnderlined(true);
         }
 
+        public void mousePressed(MouseEvent evt) {
+            if (evt.getButton() == MouseEvent.BUTTON1)
+                setOutline(true);
+        }
+
         public void mouseClicked(MouseEvent evt) {
             if (evt.getButton() == MouseEvent.BUTTON1 &&
-                    evt.getClickCount() == 1) {
+                    evt.getClickCount() == 1)
                 fireActionEvent(evt);
-            }
+        }
+
+        public void mouseReleased(MouseEvent evt) {
+            if (evt.getButton() == MouseEvent.BUTTON1)
+                setOutline(false);
         }
 
         public void mouseExited(MouseEvent evt) {
