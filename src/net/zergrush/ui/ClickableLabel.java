@@ -10,6 +10,7 @@ import java.awt.font.TextAttribute;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 public class ClickableLabel extends JLabel {
@@ -50,6 +51,7 @@ public class ClickableLabel extends JLabel {
     protected void createUI() {
         addMouseListener(new MouseTracker());
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        setOutline(false);
     }
 
     public String getActionCommand() {
@@ -100,6 +102,14 @@ public class ClickableLabel extends JLabel {
         attrs.put(TextAttribute.UNDERLINE,
             (underline ? TextAttribute.UNDERLINE_ON : -1));
         setFont(font.deriveFont(attrs));
+    }
+
+    public void setOutline(boolean outline) {
+        if (outline) {
+            setBorder(BorderFactory.createDashedBorder(null));
+        } else {
+            setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        }
     }
 
 }
