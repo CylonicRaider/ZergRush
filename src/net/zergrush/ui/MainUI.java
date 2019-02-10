@@ -49,6 +49,8 @@ public class MainUI extends JPanel implements GameUI,
 
     private static final long serialVersionUID = -2329967477365368049L;
 
+    public static final int WINDOW_ICON_SIZE = 128;
+
     private final GameArea gameArea;
     private final JLabel headingMessage;
     private final JPanel actionPanel;
@@ -272,6 +274,7 @@ public class MainUI extends JPanel implements GameUI,
         window.pack();
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setIconImage(GameArea.renderWindowIcon(WINDOW_ICON_SIZE));
         ui.requestFocusInWindow();
         return window;
     }

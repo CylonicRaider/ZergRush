@@ -3,14 +3,18 @@ package net.zergrush.ui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import net.zergrush.Game;
+import net.zergrush.sprites.Player;
+import net.zergrush.sprites.Zerg;
 
 public class GameArea extends JComponent {
 
@@ -142,6 +146,27 @@ public class GameArea extends JComponent {
     public void doLayout() {
         super.doLayout();
         updateFontSize();
+    }
+
+    public static Image renderWindowIcon(int s) {
+        BufferedImage result = new BufferedImage(s, s,
+                                                 BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = result.createGraphics();
+        g.addRenderingHints(GameArea.RENDERING_HINTS);
+        /* Background */
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, s, s);
+        /* Zerg */
+        g.setColor(Zerg.COLOR);
+        g.fillRect(s / 2, 0, s, s / 2);
+        /* Player */
+        g.setColor(Player.COLOR);
+        g.translate(s / 3.0, s * 2 / 3.0);
+        g.scale(s * 3.0, s * 3.0);
+        g.fill(Player.SHAPE);
+        /* Done */
+        g.dispose();
+        return result;
     }
 
 }
