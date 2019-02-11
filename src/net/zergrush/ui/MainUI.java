@@ -136,7 +136,7 @@ public class MainUI extends JPanel implements GameUI,
 
     public HTMLDialog getHTMLDialog() {
         if (dialog == null) {
-            dialog = new HTMLDialog(getWindow(this));
+            dialog = new HTMLDialog(SwingUtilities.getWindowAncestor(this));
             dialog.getDisplay().setPreferredSize(getSize());
             dialog.pack();
             dialog.setLocationRelativeTo(dialog.getOwner());
@@ -251,15 +251,6 @@ public class MainUI extends JPanel implements GameUI,
                 r.run();
             }
         }).start();
-    }
-
-    private static Window getWindow(Component comp) {
-        while (comp != null) {
-            if (comp instanceof Window)
-                return (Window) comp;
-            comp = comp.getParent();
-        }
-        return null;
     }
 
     public static void closeWindow(Window win) {
