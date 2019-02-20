@@ -14,6 +14,7 @@ import net.zergrush.sprites.HPSprite;
 import net.zergrush.sprites.Player;
 import net.zergrush.sprites.Sprite;
 import net.zergrush.sprites.Zerg;
+import net.zergrush.stats.GameStatistics;
 
 public class Game {
 

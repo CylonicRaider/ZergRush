@@ -1,4 +1,4 @@
-package net.zergrush;
+package net.zergrush.stats;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

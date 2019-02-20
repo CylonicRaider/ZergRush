@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import net.zergrush.Game;
-import net.zergrush.GameStatistics;
+import net.zergrush.stats.GameStatistics;
 
 public class Zerg extends HPSprite {
 

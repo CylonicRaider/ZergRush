@@ -1,4 +1,4 @@
-package net.zergrush;
+package net.zergrush.stats;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -27,7 +27,7 @@ public class GameStatistics extends Statistics {
         listeners.remove(l);
     }
 
-    protected void reset() {
+    public void reset() {
         clear();
         init(SCORE, "Points reached", 0);
         fireResetListeners();
