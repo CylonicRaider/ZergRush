@@ -57,7 +57,7 @@ public class Statistics {
 
         protected static String debugString(Key<?> key) {
             if (key == null) return "null";
-            return String.format("%s%x[name=%s,type=%s]",
+            return String.format("%s@%x[name=%s,type=%s]",
                 key.getClass().getName(), System.identityHashCode(key),
                 key.getName(), key.getType());
         }
