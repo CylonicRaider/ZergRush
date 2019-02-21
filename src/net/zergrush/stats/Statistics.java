@@ -1,6 +1,7 @@
 package net.zergrush.stats;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,20 @@ public class Statistics {
             return type;
         }
 
+        protected void ensureMatches(Key<?> other) {
+            if (! equals(other) || ! type.equals(other.getType()))
+                throw new IllegalArgumentException("Statistics keys do not " +
+                    "match: " + debugString(this) + " <--> " +
+                    debugString(other));
+        }
+
+        protected static String debugString(Key<?> key) {
+            if (key == null) return "null";
+            return String.format("%s%x[name=%s,type=%s]",
+                key.getClass().getName(), System.identityHashCode(key),
+                key.getName(), key.getType());
+        }
+
     }
 
     public class Entry<T> {
@@ -87,15 +102,18 @@ public class Statistics {
         }
 
         public void setValue(T v) {
+            ensureNotFrozen();
             value = key.getType().cast(v);
             fireChangeEvent();
         }
 
         public void addListener(ChangeListener<T> l) {
+            ensureNotFrozen();
             listeners.add(l);
         }
 
         public void removeListener(ChangeListener<T> l) {
+            ensureNotFrozen();
             listeners.remove(l);
         }
 
@@ -108,9 +126,29 @@ public class Statistics {
     }
 
     private final Map<Key<?>, Entry<?>> data;
+    private final boolean frozen;
 
+    public Statistics(Collection<Entry<?>> entries, boolean frozen) {
+        Map<Key<?>, Entry<?>> data = new LinkedHashMap<>();
+        this.data = Collections.unmodifiableMap(data);
+        this.frozen = frozen;
+        for (Entry<?> ent : entries) {
+            importEntry(data, ent);
+        }
+    }
+    public Statistics(Map<Key<?>, Entry<?>> data, boolean frozen) {
+        this(validatedEntries(data), frozen);
+    }
     public Statistics() {
         data = new LinkedHashMap<>();
+        frozen = false;
+    }
+
+    private <T> void importEntry(Map<Key<?>, Entry<?>> data, Entry<T> ent) {
+        // We need to outline this into a method in order to be able to name
+        // the type variable.
+        data.put(ent.getKey(), new Entry<T>(ent.getKey(),
+            ent.getDescription(), ent.getValue()));
     }
 
     public <T> Entry<T> getEntry(Key<T> key) {
@@ -162,6 +200,28 @@ public class Statistics {
     public void increment(Key<Double> key, double incr) {
         Entry<Double> ent = getEntry(key);
         ent.setValue(ent.getValue() + incr);
+    }
+
+    public boolean isFrozen() {
+        return frozen;
+    }
+
+    public Statistics freeze() {
+        return new Statistics(data, true);
+    }
+
+    private void ensureNotFrozen() {
+        if (frozen)
+            throw new UnsupportedOperationException("Modifying a frozen " +
+                "Statistics");
+    }
+
+    private static Collection<Entry<?>> validatedEntries(
+            Map<Key<?>, Entry<?>> data) {
+        for (Map.Entry<Key<?>, Entry<?>> ent : data.entrySet()) {
+            ent.getKey().ensureMatches(ent.getValue().getKey());
+        }
+        return data.values();
     }
 
 }
