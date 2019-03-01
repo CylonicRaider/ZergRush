@@ -147,8 +147,8 @@ public class Game {
         }
         if (state == State.PLAYING || state == State.OVER) {
             /* Erase sprites
-             * This has to happen before the updating pass because some HP bars
-             * might be missed otherwise. */
+             * This has to happen before the updating pass because some HP
+             * bars might be missed otherwise. */
             eraseSprite(base);
             for (Zerg z : zergs) eraseSprite(z);
             eraseSprite(player);
