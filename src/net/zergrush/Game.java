@@ -84,6 +84,7 @@ public class Game {
                 ui.setMessage("PAUSED");
                 break;
             case OVER:
+                stats.put(GameStatistics.ENDED, System.currentTimeMillis());
                 ui.setMessage("GAME OVER",
                     new KeyboardAction("Enter", "retry"),
                     new KeyboardAction("Escape", "quit"));

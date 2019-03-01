@@ -14,8 +14,12 @@ public class Highscores {
         }
 
         public int compareTo(Entry other) {
-            // We sort by *descending* score.
-            return Integer.compare(other.getScore(), getScore());
+            // We sort by descending score and ascending date; thus, matching
+            // a score present in the highscores might not be sufficient to
+            // be added to them.
+            if (getScore() != other.getScore())
+                return Integer.compare(other.getScore(), getScore());
+            return Long.compare(getDate(), other.getDate());
         }
 
         public Statistics getData() {
@@ -25,6 +29,12 @@ public class Highscores {
         public int getScore() {
             Integer value = data.get(GameStatistics.SCORE);
             if (value == null) return -1;
+            return value;
+        }
+
+        public long getDate() {
+            Long value = data.get(GameStatistics.ENDED);
+            if (value == null) return Long.MAX_VALUE;
             return value;
         }
 
