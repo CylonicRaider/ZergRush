@@ -38,6 +38,10 @@ public class Highscores {
             return value;
         }
 
+        public String getName() {
+            return data.get(GameStatistics.NAME);
+        }
+
     }
 
     private final NavigableSet<Entry> entries;

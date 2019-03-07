@@ -22,6 +22,7 @@ public class GameStatistics extends Statistics {
     public static final Key<Integer> SCORE = intKey("score");
     public static final Key<Long> STARTED = longKey("started");
     public static final Key<Long> ENDED = longKey("ended");
+    public static final Key<String> NAME = stringKey("name");
 
     private final List<ResetListener> listeners;
 
@@ -67,6 +68,9 @@ public class GameStatistics extends Statistics {
     }
     protected static Key<Double> doubleKey(String name) {
         return register(new Key<>(name, Double.class));
+    }
+    protected static Key<String> stringKey(String name) {
+        return register(new Key<>(name, String.class));
     }
 
 }
