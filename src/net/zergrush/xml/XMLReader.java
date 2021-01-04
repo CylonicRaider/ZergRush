@@ -99,4 +99,18 @@ public class XMLReader implements Iterable<DataItem> {
         }
     }
 
+    public static <T> T read(XMLConverterRegistry registry, Element source,
+                             String expectedName, Class<T> cls) {
+        XMLReader rd = new XMLReader(registry);
+        DataItem root = rd.load(source);
+        if (! root.getName().equals(expectedName))
+            throw new IllegalArgumentException("Expected serialized " +
+                expectedName + " object, got " + root.getName());
+        return rd.read(cls, root);
+    }
+    public static <T> T read(Element source, String expectedName,
+                             Class<T> cls) {
+        return read(XMLConverterRegistry.DEFAULT, source, expectedName, cls);
+    }
+
 }

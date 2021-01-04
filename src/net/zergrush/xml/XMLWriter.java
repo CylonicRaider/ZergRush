@@ -94,4 +94,13 @@ public class XMLWriter {
         buffer.get(newItem.getName()).add(newItem);
     }
 
+    public static <T> void write(XMLConverterRegistry registry,
+                                 Document drain, String name, T value) {
+        XMLWriter wr = new XMLWriter(registry, drain);
+        wr.write(name, value);
+    }
+    public static <T> void write(Document drain, String name, T value) {
+        write(XMLConverterRegistry.DEFAULT, drain, name, value);
+    }
+
 }
