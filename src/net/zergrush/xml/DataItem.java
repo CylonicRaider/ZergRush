@@ -4,27 +4,20 @@ import org.w3c.dom.Element;
 
 public class DataItem {
 
-    private final DataItem parent;
     private final boolean attribute;
     private final String name;
     private final Object value;
 
-    private DataItem(DataItem parent, boolean attribute, String name,
-                     Object value) {
-        this.parent = parent;
+    private DataItem(boolean attribute, String name, Object value) {
         this.attribute = attribute;
         this.name = name;
         this.value = value;
     }
-    public DataItem(DataItem parent, String name, String value) {
-        this(parent, true, name, value);
+    public DataItem(String name, String value) {
+        this(true, name, value);
     }
-    public DataItem(DataItem parent, String name, Element value) {
-        this(parent, false, name, value);
-    }
-
-    public DataItem getParent() {
-        return parent;
+    public DataItem(Element value) {
+        this(false, value.getTagName(), value);
     }
 
     public boolean isAttribute() {

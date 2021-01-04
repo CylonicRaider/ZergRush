@@ -1,27 +1,97 @@
 package net.zergrush.xml;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class XMLWriter {
 
-    private Element drain;
+    private final XMLConverterRegistry registry;
+    private final Document document;
+    private Map<String, List<DataItem>> buffer;
 
-    public XMLWriter(Element drain) {
-        this.drain = drain;
+    public XMLWriter(XMLConverterRegistry registry, Document document) {
+        this.registry = registry;
+        this.document = document;
     }
 
-    public void enterElement(String name) {
-        Element newElem = drain.getOwnerDocument().createElement(name);
-        drain.appendChild(newElem);
-        drain = newElem;
+    private DataItem aggregateBuffer(String name, boolean forceElement) {
+        if (! forceElement && buffer.size() == 1) {
+            Map.Entry<String, List<DataItem>> pair =
+                buffer.entrySet().iterator().next();
+            if (pair.getKey().equals("value") &&
+                    pair.getValue().size() == 1 &&
+                    pair.getValue().get(0).isAttribute()) {
+                return new DataItem(name,
+                    pair.getValue().get(0).getAttributeValue());
+            }
+        }
+        Element res = document.createElement(name);
+        for (Map.Entry<String, List<DataItem>> pair : buffer.entrySet()) {
+            List<DataItem> items = pair.getValue();
+            if (items.size() == 1 && items.get(0).isAttribute()) {
+                res.setAttribute(pair.getKey(),
+                                 items.get(0).getAttributeValue());
+                continue;
+            }
+            for (DataItem item : items) {
+                if (item.isAttribute()) {
+                    Element inflatedItem = document.createElement(
+                        pair.getKey());
+                    inflatedItem.setAttribute("value",
+                                              item.getAttributeValue());
+                    res.appendChild(inflatedItem);
+                } else {
+                    res.appendChild(item.getElementValue());
+                }
+            }
+        }
+        return new DataItem(res);
     }
 
-    public void writeAttribute(String name, String value) {
-        drain.setAttribute(name, value);
+    private <T> void dispatchWrite(T value) {
+        // This one's nasty: From the type checker's perspective, T can be any
+        // supertype of the runtime class of value; thus, value.getClass()
+        // need not be a Class<T> at all. We, of course, know that the
+        // XMLConverter retrieved for value's runtime class will be compatible
+        // with value, but that is not expressible in Java's type system.
+        @SuppressWarnings("unchecked")
+        Class<T> cls = (Class<T>) value.getClass();
+        registry.get(cls).writeXML(value, this);
+    }
+    private void write(String name, Object value, boolean forceElement) {
+        Map<String, List<DataItem>> bufferBackup = buffer;
+        try {
+            buffer = new LinkedHashMap<>();
+            dispatchWrite(value);
+            if (bufferBackup == null) {
+                document.appendChild(aggregateBuffer(name, true)
+                    .getElementValue());
+            } else {
+                add(bufferBackup, aggregateBuffer(name, forceElement));
+            }
+        } finally {
+            buffer = bufferBackup;
+        }
     }
 
-    public void exitElement() {
-        drain = (Element) drain.getParentNode();
+    public void writeValue(String value) {
+        add(buffer, new DataItem("value", value));
+    }
+
+    public void write(String name, Object value) {
+        write(name, value, false);
+    }
+
+    private static void add(Map<String, List<DataItem>> buffer,
+                            DataItem newItem) {
+        if (! buffer.containsKey(newItem.getName()))
+            buffer.put(newItem.getName(), new ArrayList<DataItem>());
+        buffer.get(newItem.getName()).add(newItem);
     }
 
 }
