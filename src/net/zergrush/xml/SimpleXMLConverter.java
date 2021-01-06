@@ -22,6 +22,26 @@ public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
 
     protected abstract T fromString(String serialized);
 
-    protected abstract String toString(T value);
+    protected String toString(T value) {
+        return value.toString();
+    }
+
+    public static void registerDefaults(XMLConverterRegistry reg) {
+        reg.add(String.class, new SimpleXMLConverter<String>() {
+            protected String fromString(String serialized) {
+                return serialized;
+            }
+        });
+        reg.add(Integer.class, new SimpleXMLConverter<Integer>() {
+            protected Integer fromString(String serialized) {
+                return Integer.valueOf(serialized);
+            }
+        });
+        reg.add(Long.class, new SimpleXMLConverter<Long>() {
+            protected Long fromString(String serialized) {
+                return Long.valueOf(serialized);
+            }
+        });
+    }
 
 }

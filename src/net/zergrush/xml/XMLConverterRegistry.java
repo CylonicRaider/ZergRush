@@ -9,6 +9,7 @@ public class XMLConverterRegistry {
 
     static {
         DEFAULT = new XMLConverterRegistry();
+        SimpleXMLConverter.registerDefaults(DEFAULT);
     }
 
     private final Map<Class<?>, XMLConverter<?>> converters;
