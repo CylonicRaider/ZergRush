@@ -53,7 +53,7 @@ public class XMLWriter {
         return new DataItem(res);
     }
 
-    private <T> void dispatchWrite(T value) {
+    private <T> void dispatchWrite(T value) throws XMLConversionException {
         // This one's nasty: From the type checker's perspective, T can be any
         // supertype of the runtime class of value; thus, value.getClass()
         // need not be a Class<T> at all. We, of course, know that the
@@ -63,7 +63,8 @@ public class XMLWriter {
         Class<T> cls = (Class<T>) value.getClass();
         registry.get(cls).writeXML(value, this);
     }
-    private void write(String name, Object value, boolean forceElement) {
+    private void write(String name, Object value, boolean forceElement)
+            throws XMLConversionException {
         Map<String, List<DataItem>> bufferBackup = buffer;
         try {
             buffer = new LinkedHashMap<>();
@@ -79,11 +80,12 @@ public class XMLWriter {
         }
     }
 
-    public void writeValue(String value) {
+    public void writeValue(String value) throws XMLConversionException {
         add(buffer, new DataItem("value", value));
     }
 
-    public void write(String name, Object value) {
+    public void write(String name, Object value)
+            throws XMLConversionException {
         write(name, value, false);
     }
 
@@ -95,11 +97,13 @@ public class XMLWriter {
     }
 
     public static <T> void write(XMLConverterRegistry registry,
-                                 Document drain, String name, T value) {
+                                 Document drain, String name, T value)
+            throws XMLConversionException {
         XMLWriter wr = new XMLWriter(registry, drain);
         wr.write(name, value);
     }
-    public static <T> void write(Document drain, String name, T value) {
+    public static <T> void write(Document drain, String name, T value)
+            throws XMLConversionException {
         write(XMLConverterRegistry.DEFAULT, drain, name, value);
     }
 

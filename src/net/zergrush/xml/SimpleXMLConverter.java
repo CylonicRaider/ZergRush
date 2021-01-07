@@ -2,7 +2,7 @@ package net.zergrush.xml;
 
 public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
 
-    public T readXML(XMLReader source) {
+    public T readXML(XMLReader source) throws XMLConversionException {
         DataItem value = null;
         for (DataItem di : source) {
             if (! di.isAttribute() || ! di.getName().equals("value"))
@@ -16,13 +16,15 @@ public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
         return fromString(value.getAttributeValue());
     }
 
-    public void writeXML(T value, XMLWriter drain) {
+    public void writeXML(T value, XMLWriter drain)
+            throws XMLConversionException {
         drain.writeValue(toString(value));
     }
 
-    protected abstract T fromString(String serialized);
+    protected abstract T fromString(String serialized)
+        throws XMLConversionException;
 
-    protected String toString(T value) {
+    protected String toString(T value) throws XMLConversionException {
         return value.toString();
     }
 
@@ -33,13 +35,23 @@ public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
             }
         });
         reg.add(Integer.class, new SimpleXMLConverter<Integer>() {
-            protected Integer fromString(String serialized) {
-                return Integer.valueOf(serialized);
+            protected Integer fromString(String serialized)
+                    throws XMLConversionException {
+                try {
+                    return Integer.valueOf(serialized);
+                } catch (NumberFormatException exc) {
+                    throw new XMLConversionException(exc);
+                }
             }
         });
         reg.add(Long.class, new SimpleXMLConverter<Long>() {
-            protected Long fromString(String serialized) {
-                return Long.valueOf(serialized);
+            protected Long fromString(String serialized)
+                    throws XMLConversionException {
+                try {
+                    return Long.valueOf(serialized);
+                } catch (NumberFormatException exc) {
+                    throw new XMLConversionException(exc);
+                }
             }
         });
     }
