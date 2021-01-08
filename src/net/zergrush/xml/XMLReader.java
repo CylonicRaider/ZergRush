@@ -106,7 +106,7 @@ public class XMLReader implements Iterable<DataItem> {
         XMLReader rd = new XMLReader(registry);
         DataItem root = rd.load(source);
         if (! root.getName().equals(expectedName))
-            throw new IllegalArgumentException("Expected serialized " +
+            throw new XMLConversionException("Expected serialized " +
                 expectedName + " object, got " + root.getName());
         return rd.read(cls, root);
     }
