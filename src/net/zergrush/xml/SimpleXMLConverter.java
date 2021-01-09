@@ -6,10 +6,10 @@ public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
         DataItem value = null;
         for (DataItem di : source) {
             if (! di.isAttribute() || ! di.getName().equals("value"))
-                throw new IllegalArgumentException(
+                throw new XMLConversionException(
                     "Cannot map complex XML object to simple type");
             if (value != null)
-                throw new IllegalArgumentException(
+                throw new XMLConversionException(
                     "Multiple values provided for simple type");
             value = di;
         }
