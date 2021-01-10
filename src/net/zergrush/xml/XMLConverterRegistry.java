@@ -25,6 +25,8 @@ public class XMLConverterRegistry {
     }
 
     public <T> void add(Class<T> cls, XMLConverter<T> converter) {
+        if (cls == null || converter == null)
+            throw new NullPointerException();
         converters.put(cls, converter);
     }
 

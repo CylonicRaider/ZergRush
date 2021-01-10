@@ -15,6 +15,8 @@ public class XMLWriter {
     private Map<String, List<DataItem>> buffer;
 
     public XMLWriter(XMLConverterRegistry registry, Document document) {
+        if (registry == null || document == null)
+            throw new NullPointerException();
         this.registry = registry;
         this.document = document;
     }
@@ -81,11 +83,13 @@ public class XMLWriter {
     }
 
     public void writeValue(String value) throws XMLConversionException {
+        if (value == null) throw new NullPointerException();
         add(buffer, new DataItem("value", value));
     }
 
     public void write(String name, Object value)
             throws XMLConversionException {
+        if (name == null) throw new NullPointerException();
         write(name, value, false);
     }
 

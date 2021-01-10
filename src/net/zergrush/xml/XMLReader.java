@@ -73,10 +73,12 @@ public class XMLReader implements Iterable<DataItem> {
     private ItemIterator iter;
 
     public XMLReader(XMLConverterRegistry registry) {
+        if (registry == null) throw new NullPointerException();
         this.registry = registry;
     }
 
     public DataItem load(Element source) {
+        if (source == null) throw new NullPointerException();
         iter = new ItemIterator(new DataItem(source));
         return iter.getSource();
     }
@@ -91,6 +93,7 @@ public class XMLReader implements Iterable<DataItem> {
 
     public <T> T read(Class<T> cls, DataItem data)
             throws XMLConversionException {
+        if (cls == null || data == null) throw new NullPointerException();
         ItemIterator iterBackup = iter;
         try {
             iter = new ItemIterator(data);
@@ -103,6 +106,7 @@ public class XMLReader implements Iterable<DataItem> {
     public static <T> T read(XMLConverterRegistry registry, Element source,
                              String expectedName, Class<T> cls)
             throws XMLConversionException {
+        if (expectedName == null) throw new NullPointerException();
         XMLReader rd = new XMLReader(registry);
         DataItem root = rd.load(source);
         if (! root.getName().equals(expectedName))

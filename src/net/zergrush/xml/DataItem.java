@@ -9,6 +9,7 @@ public class DataItem {
     private final Object value;
 
     private DataItem(boolean attribute, String name, Object value) {
+        if (name == null || value == null) throw new NullPointerException();
         this.attribute = attribute;
         this.name = name;
         this.value = value;
