@@ -67,6 +67,8 @@ public class XMLWriter {
     }
     private void write(String name, Object value, boolean forceElement)
             throws XMLConversionException {
+        if (name == null) throw new NullPointerException();
+        if (value == null) return;
         Map<String, List<DataItem>> bufferBackup = buffer;
         try {
             buffer = new LinkedHashMap<>();
@@ -89,9 +91,12 @@ public class XMLWriter {
 
     public void write(String name, Object value)
             throws XMLConversionException {
-        if (name == null) throw new NullPointerException();
-        if (value == null) return;
         write(name, value, false);
+    }
+
+    public void writeItem(String name, Object value)
+            throws XMLConversionException {
+        write(name, value, true);
     }
 
     private static void add(Map<String, List<DataItem>> buffer,
