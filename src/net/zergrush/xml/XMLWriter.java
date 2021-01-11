@@ -83,13 +83,14 @@ public class XMLWriter {
     }
 
     public void writeValue(String value) throws XMLConversionException {
-        if (value == null) throw new NullPointerException();
+        if (value == null) return;
         add(buffer, new DataItem("value", value));
     }
 
     public void write(String name, Object value)
             throws XMLConversionException {
         if (name == null) throw new NullPointerException();
+        if (value == null) return;
         write(name, value, false);
     }
 
