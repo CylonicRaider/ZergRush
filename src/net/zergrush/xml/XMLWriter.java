@@ -63,7 +63,7 @@ public class XMLWriter {
         // with value, but that is not expressible in Java's type system.
         @SuppressWarnings("unchecked")
         Class<T> cls = (Class<T>) value.getClass();
-        registry.get(cls).writeXML(value, this);
+        registry.get(cls).writeXML(this, value);
     }
     private void write(String name, Object value, boolean forceElement)
             throws XMLConversionException {

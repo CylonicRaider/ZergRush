@@ -16,7 +16,7 @@ public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
         return fromString(value.getAttributeValue());
     }
 
-    public void writeXML(T value, XMLWriter drain)
+    public void writeXML(XMLWriter drain, T value)
             throws XMLConversionException {
         drain.writeValue(toString(value));
     }
