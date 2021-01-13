@@ -55,6 +55,11 @@ public class XMLWriter {
         return new DataItem(res);
     }
 
+    public void writeValue(String value) throws XMLConversionException {
+        if (value == null) return;
+        add(buffer, new DataItem("value", value));
+    }
+
     private <T> void dispatchWrite(T value) throws XMLConversionException {
         // This one's nasty: From the type checker's perspective, T can be any
         // supertype of the runtime class of value; thus, value.getClass()
@@ -65,7 +70,7 @@ public class XMLWriter {
         Class<T> cls = (Class<T>) value.getClass();
         registry.get(cls).writeXML(this, value);
     }
-    private void write(String name, Object value, boolean forceElement)
+    public void write(String name, Object value)
             throws XMLConversionException {
         if (name == null) throw new NullPointerException();
         if (value == null) return;
@@ -77,26 +82,11 @@ public class XMLWriter {
                 document.appendChild(aggregateBuffer(name, true)
                     .getElementValue());
             } else {
-                add(bufferBackup, aggregateBuffer(name, forceElement));
+                add(bufferBackup, aggregateBuffer(name, false));
             }
         } finally {
             buffer = bufferBackup;
         }
-    }
-
-    public void writeValue(String value) throws XMLConversionException {
-        if (value == null) return;
-        add(buffer, new DataItem("value", value));
-    }
-
-    public void write(String name, Object value)
-            throws XMLConversionException {
-        write(name, value, false);
-    }
-
-    public void writeItem(String name, Object value)
-            throws XMLConversionException {
-        write(name, value, true);
     }
 
     private static void add(Map<String, List<DataItem>> buffer,
