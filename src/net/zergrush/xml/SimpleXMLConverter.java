@@ -29,6 +29,11 @@ public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
     }
 
     public static void registerDefaults(XMLConverterRegistry reg) {
+        reg.add(Boolean.class, new SimpleXMLConverter<Boolean>() {
+            protected Boolean fromString(String serialized) {
+                return Boolean.valueOf(serialized);
+            }
+        });
         reg.add(String.class, new SimpleXMLConverter<String>() {
             protected String fromString(String serialized) {
                 return serialized;
