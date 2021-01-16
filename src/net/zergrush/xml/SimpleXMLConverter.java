@@ -13,7 +13,11 @@ public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
                     "Multiple values provided for simple type");
             value = di;
         }
-        return fromString(value.getAttributeValue());
+        try {
+            return fromString(value.getAttributeValue());
+        } catch (IllegalArgumentException exc) {
+            throw new XMLConversionException(exc);
+        }
     }
 
     public void writeXML(XMLWriter drain, T value)
@@ -42,21 +46,13 @@ public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
         reg.add(Integer.class, new SimpleXMLConverter<Integer>() {
             protected Integer fromString(String serialized)
                     throws XMLConversionException {
-                try {
-                    return Integer.valueOf(serialized);
-                } catch (NumberFormatException exc) {
-                    throw new XMLConversionException(exc);
-                }
+                return Integer.valueOf(serialized);
             }
         });
         reg.add(Long.class, new SimpleXMLConverter<Long>() {
             protected Long fromString(String serialized)
                     throws XMLConversionException {
-                try {
-                    return Long.valueOf(serialized);
-                } catch (NumberFormatException exc) {
-                    throw new XMLConversionException(exc);
-                }
+                return Long.valueOf(serialized);
             }
         });
     }
