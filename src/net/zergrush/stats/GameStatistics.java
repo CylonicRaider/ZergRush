@@ -27,7 +27,7 @@ public class GameStatistics extends Statistics {
     private final List<ResetListener> listeners;
 
     public GameStatistics() {
-        listeners = new CopyOnWriteArrayList<ResetListener>();
+        listeners = new CopyOnWriteArrayList<>();
     }
 
     public void addResetListener(ResetListener l) {

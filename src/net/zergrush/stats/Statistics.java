@@ -147,7 +147,7 @@ public class Statistics {
     private <T> void importEntry(Map<Key<?>, Entry<?>> data, Entry<T> ent) {
         // We need to outline this into a method in order to be able to name
         // the type variable.
-        data.put(ent.getKey(), new Entry<T>(ent.getKey(),
+        data.put(ent.getKey(), new Entry<>(ent.getKey(),
             ent.getDescription(), ent.getValue()));
     }
 
@@ -162,7 +162,7 @@ public class Statistics {
     }
 
     public <T> Entry<T> init(Key<T> key, String description, T value) {
-        Entry<T> ent = new Entry<T>(key, description, value);
+        Entry<T> ent = new Entry<>(key, description, value);
         if (data.put(key, ent) != null)
             throw new IllegalStateException("Initializing already-existing " +
                 "entry for key " + key);
@@ -177,7 +177,7 @@ public class Statistics {
     public <T> void put(Key<T> key, T value) {
         Entry<T> ent = getEntry(key);
         if (ent == null) {
-            ent = new Entry<T>(key, value);
+            ent = new Entry<>(key, value);
             data.put(key, ent);
         } else {
             ent.setValue(value);

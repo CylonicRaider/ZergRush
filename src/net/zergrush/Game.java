@@ -214,7 +214,7 @@ public class Game {
             List<Zerg> ret = null;
             for (Zerg z : zergs) {
                 if (bounds.intersects(z.getBounds())) {
-                    if (ret == null) ret = new ArrayList<Zerg>();
+                    if (ret == null) ret = new ArrayList<>();
                     ret.add(z);
                 }
             }
