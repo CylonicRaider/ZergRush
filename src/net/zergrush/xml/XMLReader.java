@@ -11,6 +11,7 @@ public class XMLReader implements Iterable<DataItem> {
 
     private static class ItemIterator implements Iterator<DataItem> {
 
+        private final ItemIterator parent;
         private final DataItem source;
         private final NamedNodeMap attributes;
         private final NodeList children;
@@ -18,7 +19,8 @@ public class XMLReader implements Iterable<DataItem> {
         private int attrIndex;
         private int childIndex;
 
-        public ItemIterator(DataItem source) {
+        public ItemIterator(ItemIterator parent, DataItem source) {
+            this.parent = parent;
             this.source = source;
             if (source.isAttribute()) {
                 attributes = source.getElementValue().getAttributes();
@@ -29,6 +31,10 @@ public class XMLReader implements Iterable<DataItem> {
                 children = null;
                 next = new DataItem("value", source.getAttributeValue());
             }
+        }
+
+        public ItemIterator getParent() {
+            return parent;
         }
 
         public DataItem getSource() {
@@ -75,12 +81,16 @@ public class XMLReader implements Iterable<DataItem> {
     public XMLReader(XMLConverterRegistry registry) {
         if (registry == null) throw new NullPointerException();
         this.registry = registry;
+        this.iter = null;
     }
 
     public DataItem load(Element source) {
-        if (source == null) throw new NullPointerException();
-        iter = new ItemIterator(new DataItem(source));
-        return iter.getSource();
+        return new DataItem(source);
+    }
+
+    public void enter(DataItem item) {
+        if (item == null) throw new NullPointerException();
+        iter = new ItemIterator(iter, item);
     }
 
     public String getName() {
@@ -91,15 +101,18 @@ public class XMLReader implements Iterable<DataItem> {
         return iter;
     }
 
+    public void exit() {
+        iter = iter.getParent();
+    }
+
     public <T> T read(Class<T> cls, DataItem data)
             throws XMLConversionException {
         if (cls == null || data == null) throw new NullPointerException();
-        ItemIterator iterBackup = iter;
+        enter(data);
         try {
-            iter = new ItemIterator(data);
             return registry.get(cls).readXML(this);
         } finally {
-            iter = iterBackup;
+            exit();
         }
     }
 
