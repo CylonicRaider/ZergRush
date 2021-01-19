@@ -1,6 +1,8 @@
 package net.zergrush.xml;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -99,6 +101,17 @@ public class XMLReader implements Iterable<DataItem> {
 
     public Iterator<DataItem> iterator() {
         return iter;
+    }
+
+    public List<DataItem> getItems(String name) {
+        List<DataItem> ret = new ArrayList<>();
+        ItemIterator localIter = new ItemIterator(null, iter.getSource());
+        while (localIter.hasNext()) {
+            DataItem it = localIter.next();
+            if (! it.getName().equals(name)) continue;
+            ret.add(it);
+        }
+        return ret;
     }
 
     public void exit() {
