@@ -167,6 +167,14 @@ public class XMLReader implements Iterable<DataItem> {
         return state.getItems(name);
     }
 
+    public DataItem getOnlyItem(String name) throws XMLConversionException {
+        List<DataItem> bucket = geItems(name);
+        if (bucket.size() != 1)
+            throw new XMLConversionException("Expected exactly one " + name +
+                " member, got " + bucket.size());
+        return bucket.get(0);
+    }
+
     public void exit() {
         state = state.getParent();
     }
