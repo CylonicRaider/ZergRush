@@ -1,6 +1,7 @@
 package net.zergrush.xml;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -168,15 +169,11 @@ public class XMLReader implements Iterable<DataItem> {
     }
 
     public DataItem getOnlyItem(String name) throws XMLConversionException {
-        List<DataItem> bucket = geItems(name);
+        List<DataItem> bucket = getItems(name);
         if (bucket.size() != 1)
             throw new XMLConversionException("Expected exactly one " + name +
                 " member, got " + bucket.size());
         return bucket.get(0);
-    }
-
-    public void exit() {
-        state = state.getParent();
     }
 
     public <T> T read(Class<T> cls, DataItem data)
@@ -188,6 +185,36 @@ public class XMLReader implements Iterable<DataItem> {
         } finally {
             exit();
         }
+    }
+
+    public void exit() {
+        state = state.getParent();
+    }
+
+    public <T, U extends Collection<? super T>> U readAll(String name,
+            Class<T> cls, U drain) throws XMLConversionException {
+        for (DataItem item : getItems(name)) {
+            drain.add(read(cls, item));
+        }
+        return drain;
+    }
+
+    public <T> List<T> readAll(String name, Class<T> cls)
+            throws XMLConversionException {
+        return readAll(name, cls, new ArrayList<T>());
+    }
+
+    public <T, U extends Map<String, ? super T>> U readMap(Class<T> cls,
+            U drain) throws XMLConversionException {
+        for (DataItem item : this) {
+            drain.put(item.getName(), read(cls, item));
+        }
+        return drain;
+    }
+
+    public <T> Map<String, T> readMap(Class<T> cls)
+            throws XMLConversionException {
+        return readMap(cls, new LinkedHashMap<String, T>());
     }
 
     public static <T> T read(XMLConverterRegistry registry, Element source,

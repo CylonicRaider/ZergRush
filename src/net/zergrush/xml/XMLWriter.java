@@ -1,6 +1,7 @@
 package net.zergrush.xml;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -120,6 +121,20 @@ public class XMLWriter {
             parent.add(curWriter.aggregate(false));
         }
         curWriter = parent;
+    }
+
+    public void writeAll(String name, Collection<?> items)
+            throws XMLConversionException {
+        for (Object item : items) {
+            write(name, item);
+        }
+    }
+
+    public void writeMap(Map<String, ?> items)
+            throws XMLConversionException {
+        for (Map.Entry<String, ?> ent : items.entrySet()) {
+            write(ent.getKey(), ent.getValue());
+        }
     }
 
     public static <T> void write(XMLConverterRegistry registry,
