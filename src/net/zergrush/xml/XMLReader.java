@@ -176,7 +176,7 @@ public class XMLReader implements Iterable<DataItem> {
         return bucket.get(0);
     }
 
-    public <T> T read(Class<T> cls, DataItem data)
+    public <T> T read(DataItem data, Class<T> cls)
             throws XMLConversionException {
         if (cls == null || data == null) throw new NullPointerException();
         enter(data);
@@ -193,13 +193,13 @@ public class XMLReader implements Iterable<DataItem> {
 
     public <T> T readOnly(String name, Class<T> cls)
             throws XMLConversionException {
-        return read(cls, getOnlyItem(name));
+        return read(getOnlyItem(name), cls);
     }
 
     public <T, U extends Collection<? super T>> U readAll(String name,
             Class<T> cls, U drain) throws XMLConversionException {
         for (DataItem item : getItems(name)) {
-            drain.add(read(cls, item));
+            drain.add(read(item, cls));
         }
         return drain;
     }
@@ -212,7 +212,7 @@ public class XMLReader implements Iterable<DataItem> {
     public <T, U extends Map<String, ? super T>> U readMap(Class<T> cls,
             U drain) throws XMLConversionException {
         for (DataItem item : this) {
-            drain.put(item.getName(), read(cls, item));
+            drain.put(item.getName(), read(item, cls));
         }
         return drain;
     }
@@ -231,7 +231,7 @@ public class XMLReader implements Iterable<DataItem> {
         if (! root.getName().equals(expectedName))
             throw new XMLConversionException("Expected serialized " +
                 expectedName + " object, got " + root.getName());
-        return rd.read(cls, root);
+        return rd.read(root, cls);
     }
     public static <T> T read(Element source, String expectedName,
                              Class<T> cls) throws XMLConversionException {
