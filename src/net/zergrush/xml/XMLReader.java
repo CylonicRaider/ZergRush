@@ -191,6 +191,11 @@ public class XMLReader implements Iterable<DataItem> {
         state = state.getParent();
     }
 
+    public <T> T readOnly(String name, Class<T> cls)
+            throws XMLConversionException {
+        return read(cls, getOnlyItem(name));
+    }
+
     public <T, U extends Collection<? super T>> U readAll(String name,
             Class<T> cls, U drain) throws XMLConversionException {
         for (DataItem item : getItems(name)) {
