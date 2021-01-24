@@ -85,16 +85,19 @@ public class Statistics {
             return Statistics.this;
         }
 
+        public void init(String description) {
+            if (this.description != null)
+                throw new IllegalStateException("Statistics entry already " +
+                    "initialized");
+            this.description = description;
+        }
+
         public Key<T> getKey() {
             return key;
         }
 
         public String getDescription() {
             return description;
-        }
-
-        public void setDescription(String d) {
-            description = d;
         }
 
         public T getValue() {
@@ -161,11 +164,13 @@ public class Statistics {
         return data.values();
     }
 
-    public <T> Entry<T> init(Key<T> key, String description, T value) {
-        Entry<T> ent = new Entry<>(key, description, value);
-        if (data.put(key, ent) != null)
-            throw new IllegalStateException("Initializing already-existing " +
-                "entry for key " + key);
+    public <T> Entry<T> init(Key<T> key, String description, T defValue) {
+        Entry<T> ent = getEntry(key);
+        if (ent == null) {
+            ent = new Entry<>(key, defValue);
+            data.put(key, ent);
+        }
+        ent.init(description);
         return ent;
     }
 
