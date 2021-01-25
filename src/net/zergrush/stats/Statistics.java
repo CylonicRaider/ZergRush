@@ -180,6 +180,7 @@ public class Statistics {
     }
 
     public <T> void put(Key<T> key, T value) {
+        ensureNotFrozen();
         Entry<T> ent = getEntry(key);
         if (ent == null) {
             ent = new Entry<>(key, value);
@@ -190,10 +191,12 @@ public class Statistics {
     }
 
     public void remove(Key<?> key) {
+        ensureNotFrozen();
         data.remove(key);
     }
 
     public void clear() {
+        ensureNotFrozen();
         data.clear();
     }
 
