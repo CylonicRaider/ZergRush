@@ -132,8 +132,12 @@ public class Statistics {
     private final boolean frozen;
 
     public Statistics(Collection<Entry<?>> entries, boolean frozen) {
-        Map<Key<?>, Entry<?>> data = new LinkedHashMap<>();
-        this.data = Collections.unmodifiableMap(data);
+        if (frozen) {
+            Map<Key<?>, Entry<?>> data = new LinkedHashMap<>();
+            this.data = Collections.unmodifiableMap(data);
+        } else {
+            this.data = new LinkedHashMap<>();
+        }
         this.frozen = frozen;
         for (Entry<?> ent : entries) {
             importEntry(data, ent);

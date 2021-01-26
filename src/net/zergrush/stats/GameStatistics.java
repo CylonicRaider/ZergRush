@@ -1,5 +1,6 @@
 package net.zergrush.stats;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,10 @@ public class GameStatistics extends Statistics {
 
     private final List<ResetListener> listeners;
 
+    public GameStatistics(Collection<Entry<?>> entries, boolean frozen) {
+        super(entries, frozen);
+        listeners = new CopyOnWriteArrayList<>();
+    }
     public GameStatistics() {
         listeners = new CopyOnWriteArrayList<>();
     }
@@ -54,6 +59,10 @@ public class GameStatistics extends Statistics {
         for (ResetListener l : listeners) {
             l.onStatisticsReset(this);
         }
+    }
+
+    public GameStatistics freeze() {
+        return new GameStatistics(entries(), true);
     }
 
     protected static <T> Key<T> register(Key<T> key) {
