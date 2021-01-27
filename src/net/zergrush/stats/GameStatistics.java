@@ -5,6 +5,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import net.zergrush.xml.DataItem;
+import net.zergrush.xml.XMLConversionException;
+import net.zergrush.xml.XMLConverter;
+import net.zergrush.xml.XMLConverterRegistry;
+import net.zergrush.xml.XMLReader;
+import net.zergrush.xml.XMLWriter;
 
 public class GameStatistics extends Statistics {
 
@@ -18,6 +24,46 @@ public class GameStatistics extends Statistics {
 
     static {
         KEYS = new LinkedHashSet<>();
+        XMLConverterRegistry.DEFAULT.add(GameStatistics.class,
+            new XMLConverter<GameStatistics>() {
+
+                private <T> void decodeEntry(XMLReader rd, Entry<T> ent)
+                        throws XMLConversionException {
+                    ent.setValue(rd.readOnly("value",
+                                             ent.getKey().getType()));
+                }
+
+                public GameStatistics readXML(XMLReader rd)
+                        throws XMLConversionException {
+                    boolean frozen = rd.readOnly("frozen", Boolean.class);
+                    GameStatistics ret = new GameStatistics();
+                    for (DataItem item : rd.getItems("entry")) {
+                        rd.enter(item);
+                        try {
+                            Entry<?> ent = ret.getEntryByName(
+                                rd.readOnly("key", String.class));
+                            if (ent == null) continue;
+                            decodeEntry(rd, ent);
+                        } finally {
+                            rd.exit();
+                        }
+                    }
+                    if (frozen) ret = ret.freeze();
+                    return ret;
+                }
+
+                public void writeXML(XMLWriter wr, GameStatistics value)
+                        throws XMLConversionException {
+                    wr.write("frozen", value.isFrozen());
+                    for (Entry<?> ent : value.entries()) {
+                        wr.enter("entry");
+                        wr.write("key", ent.getKey().getName());
+                        wr.write("value", ent.getValue());
+                        wr.exit();
+                    }
+                }
+
+            });
     }
 
     public static final Key<Integer> SCORE = intKey("score");
@@ -30,9 +76,11 @@ public class GameStatistics extends Statistics {
     public GameStatistics(Collection<Entry<?>> entries, boolean frozen) {
         super(entries, frozen);
         listeners = new CopyOnWriteArrayList<>();
+        resetInner();
     }
     public GameStatistics() {
         listeners = new CopyOnWriteArrayList<>();
+        resetInner();
     }
 
     public void addResetListener(ResetListener l) {

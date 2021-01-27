@@ -164,6 +164,10 @@ public class Statistics {
         return ret;
     }
 
+    public Entry<?> getEntryByName(String name) {
+        return getEntry(new Key<Object>(name, Object.class));
+    }
+
     public Collection<Entry<?>> entries() {
         return data.values();
     }
