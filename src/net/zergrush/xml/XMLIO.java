@@ -74,13 +74,8 @@ public abstract class XMLIO {
                 return error;
             }
 
-            public void addTo(DOMConfiguration config) throws IOException {
-                try {
-                    config.setParameter("error-handler", this);
-                } catch (DOMException exc) {
-                    throw new IOException(
-                        "Cannot configure DOM error handler?!", exc);
-                }
+            public void addTo(DOMConfiguration config) throws DOMException {
+                config.setParameter("error-handler", this);
             }
 
             public boolean handleError(DOMError error) {
@@ -129,9 +124,9 @@ public abstract class XMLIO {
                 eh.addTo(p.getDomConfig());
                 return p.parse(input);
             } catch (DOMException exc) {
-                throw new IOException(exc);
+                throw new IOException(eh.agument(exc));
             } catch (LSException exc) {
-                throw new IOException(exc);
+                throw new IOException(eh.agument(exc));
             }
         }
 
@@ -146,11 +141,9 @@ public abstract class XMLIO {
                     throw eh.augment(new IOException(
                         "Could not serialize document"));
               } catch (DOMException exc) {
-                eh.augment(exc);
-                throw new IOException(exc);
+                throw new IOException(eh.agument(exc));
             } catch (LSException exc) {
-                eh.augment(exc);
-                throw new IOException(exc);
+                throw new IOException(eh.augment(exc));
             }
         }
 
