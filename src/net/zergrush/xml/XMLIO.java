@@ -124,9 +124,9 @@ public abstract class XMLIO {
                 eh.addTo(p.getDomConfig());
                 return p.parse(input);
             } catch (DOMException exc) {
-                throw new IOException(eh.agument(exc));
+                throw new IOException(eh.augment(exc));
             } catch (LSException exc) {
-                throw new IOException(eh.agument(exc));
+                throw new IOException(eh.augment(exc));
             }
         }
 
@@ -141,7 +141,7 @@ public abstract class XMLIO {
                     throw eh.augment(new IOException(
                         "Could not serialize document"));
               } catch (DOMException exc) {
-                throw new IOException(eh.agument(exc));
+                throw new IOException(eh.augment(exc));
             } catch (LSException exc) {
                 throw new IOException(eh.augment(exc));
             }
