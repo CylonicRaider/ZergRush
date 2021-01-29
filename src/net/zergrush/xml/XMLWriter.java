@@ -1,5 +1,7 @@
 package net.zergrush.xml;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -136,15 +138,35 @@ public class XMLWriter {
         }
     }
 
+    public static <T> String write(XMLConverterRegistry registry, String name,
+                                   T value)
+            throws XMLConversionException {
+        XMLIO io = XMLIO.getDefault();
+        Document doc = io.createDocument();
+        write(registry, doc, name, value);
+        try {
+            return io.writeString(doc);
+        } catch (IOException exc) {
+            throw new XMLConversionException(exc);
+        }
+    }
+    public static <T> void write(XMLConverterRegistry registry, Writer drain,
+                                 String name, T value)
+            throws XMLConversionException {
+        XMLIO io = XMLIO.getDefault();
+        Document doc = io.createDocument();
+        write(registry, doc, name, value);
+        try {
+            io.write(doc, drain);
+        } catch (IOException exc) {
+            throw new XMLConversionException(exc);
+        }
+    }
     public static <T> void write(XMLConverterRegistry registry,
                                  Document drain, String name, T value)
             throws XMLConversionException {
         XMLWriter wr = new XMLWriter(registry, drain);
         wr.write(name, value);
-    }
-    public static <T> void write(Document drain, String name, T value)
-            throws XMLConversionException {
-        write(XMLConverterRegistry.DEFAULT, drain, name, value);
     }
 
 }

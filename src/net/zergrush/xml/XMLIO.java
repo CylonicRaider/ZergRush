@@ -105,21 +105,28 @@ public abstract class XMLIO {
 
         public static final DefaultXMLIO DEFAULT = new DefaultXMLIO();
 
-        private final DOMImplementationLS impl;
+        private final DOMImplementation impl;
 
-        public DefaultXMLIO(DOMImplementationLS impl) {
+        public DefaultXMLIO(DOMImplementation impl) {
+            if (! (impl instanceof DOMImplementationLS))
+                throw new IllegalArgumentException(
+                    "DOM Load-Save required but not available");
             this.impl = impl;
         }
         public DefaultXMLIO() {
             this(getDefaultImplementation());
         }
 
+        public Document createDocument() {
+            return impl.createDocument(null, null, null);
+        }
+
         public Document read(Reader source) throws IOException {
-            LSInput input = impl.createLSInput();
+            LSInput input = ((DOMImplementationLS) impl).createLSInput();
             input.setCharacterStream(source);
             StoringErrorHandler eh = new StoringErrorHandler();
             try {
-                LSParser p = impl.createLSParser(
+                LSParser p = ((DOMImplementationLS) impl).createLSParser(
                     DOMImplementationLS.MODE_SYNCHRONOUS, null);
                 eh.addTo(p.getDomConfig());
                 return p.parse(input);
@@ -131,11 +138,12 @@ public abstract class XMLIO {
         }
 
         public void write(Document doc, Writer drain) throws IOException {
-            LSOutput output = impl.createLSOutput();
+            LSOutput output = ((DOMImplementationLS) impl).createLSOutput();
             output.setCharacterStream(drain);
             StoringErrorHandler eh = new StoringErrorHandler();
             try {
-                LSSerializer s = impl.createLSSerializer();
+                LSSerializer s = ((DOMImplementationLS) impl)
+                    .createLSSerializer();
                 eh.addTo(s.getDomConfig());
                 if (! s.write(doc, output))
                     throw eh.augment(new IOException(
@@ -147,7 +155,7 @@ public abstract class XMLIO {
             }
         }
 
-        public static DOMImplementationLS getDefaultImplementation() {
+        public static DOMImplementation getDefaultImplementation() {
             DOMImplementation impl;
             try {
                 impl = DOMImplementationRegistry.newInstance()
@@ -159,13 +167,12 @@ public abstract class XMLIO {
             } catch (IllegalAccessException exc) {
                 throw new RuntimeException(exc);
             }
-            if (! (impl instanceof DOMImplementationLS))
-                throw new IllegalArgumentException(
-                    "DOM Load-Save required but not available");
-            return (DOMImplementationLS) impl;
+            return impl;
         }
 
     }
+
+    public abstract Document createDocument();
 
     public abstract Document read(Reader source) throws IOException;
 

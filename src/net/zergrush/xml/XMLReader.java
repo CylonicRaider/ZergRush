@@ -1,5 +1,7 @@
 package net.zergrush.xml;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -222,6 +225,32 @@ public class XMLReader implements Iterable<DataItem> {
         return readMap(cls, new LinkedHashMap<String, T>());
     }
 
+    public static <T> T read(XMLConverterRegistry registry, String source,
+                             String expectedName, Class<T> cls)
+            throws XMLConversionException {
+        try {
+            return read(registry, XMLIO.getDefault().readString(source),
+                        expectedName, cls);
+        } catch (IOException exc) {
+            throw new XMLConversionException(exc);
+        }
+    }
+    public static <T> T read(XMLConverterRegistry registry, Reader source,
+                             String expectedName, Class<T> cls)
+            throws XMLConversionException {
+        try {
+            return read(registry,
+                        XMLIO.getDefault().read(source).getDocumentElement(),
+                        expectedName, cls);
+        } catch (IOException exc) {
+            throw new XMLConversionException(exc);
+        }
+    }
+    public static <T> T read(XMLConverterRegistry registry, Document source,
+                             String expectedName, Class<T> cls)
+            throws XMLConversionException {
+        return read(registry, source.getDocumentElement(), expectedName, cls);
+    }
     public static <T> T read(XMLConverterRegistry registry, Element source,
                              String expectedName, Class<T> cls)
             throws XMLConversionException {
@@ -232,10 +261,6 @@ public class XMLReader implements Iterable<DataItem> {
             throw new XMLConversionException("Expected serialized " +
                 expectedName + " object, got " + root.getName());
         return rd.read(root, cls);
-    }
-    public static <T> T read(Element source, String expectedName,
-                             Class<T> cls) throws XMLConversionException {
-        return read(XMLConverterRegistry.DEFAULT, source, expectedName, cls);
     }
 
 }
