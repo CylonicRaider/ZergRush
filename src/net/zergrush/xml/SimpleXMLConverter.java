@@ -3,16 +3,7 @@ package net.zergrush.xml;
 public abstract class SimpleXMLConverter<T> implements XMLConverter<T> {
 
     public T readXML(XMLReader source) throws XMLConversionException {
-        DataItem value = null;
-        for (DataItem di : source) {
-            if (! di.isAttribute() || ! di.getName().equals("value"))
-                throw new XMLConversionException(
-                    "Cannot map complex XML object to simple type");
-            if (value != null)
-                throw new XMLConversionException(
-                    "Multiple values provided for simple type");
-            value = di;
-        }
+        DataItem value = source.getOnlyItem("value");
         try {
             return fromString(value.getAttributeValue());
         } catch (IllegalArgumentException exc) {
