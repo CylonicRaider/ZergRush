@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class XMLConverterRegistry {
 
-    public static final XMLConverterRegistry DEFAULT;
+    private static final XMLConverterRegistry DEFAULT;
 
     static {
         DEFAULT = new XMLConverterRegistry();
@@ -28,6 +28,10 @@ public class XMLConverterRegistry {
         if (cls == null || converter == null)
             throw new NullPointerException();
         converters.put(cls, converter);
+    }
+
+    public static XMLConverterRegistry getDefault() {
+        return DEFAULT;
     }
 
 }

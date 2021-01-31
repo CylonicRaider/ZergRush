@@ -225,42 +225,4 @@ public class XMLReader implements Iterable<DataItem> {
         return readMap(cls, new LinkedHashMap<String, T>());
     }
 
-    public static <T> T read(XMLConverterRegistry registry, String source,
-                             String expectedName, Class<T> cls)
-            throws XMLConversionException {
-        try {
-            return read(registry, XMLIO.getDefault().readString(source),
-                        expectedName, cls);
-        } catch (IOException exc) {
-            throw new XMLConversionException(exc);
-        }
-    }
-    public static <T> T read(XMLConverterRegistry registry, Reader source,
-                             String expectedName, Class<T> cls)
-            throws XMLConversionException {
-        try {
-            return read(registry,
-                        XMLIO.getDefault().read(source).getDocumentElement(),
-                        expectedName, cls);
-        } catch (IOException exc) {
-            throw new XMLConversionException(exc);
-        }
-    }
-    public static <T> T read(XMLConverterRegistry registry, Document source,
-                             String expectedName, Class<T> cls)
-            throws XMLConversionException {
-        return read(registry, source.getDocumentElement(), expectedName, cls);
-    }
-    public static <T> T read(XMLConverterRegistry registry, Element source,
-                             String expectedName, Class<T> cls)
-            throws XMLConversionException {
-        if (expectedName == null) throw new NullPointerException();
-        XMLReader rd = new XMLReader(registry);
-        DataItem root = rd.load(source);
-        if (! root.getName().equals(expectedName))
-            throw new XMLConversionException("Expected serialized " +
-                expectedName + " object, got " + root.getName());
-        return rd.read(root, cls);
-    }
-
 }

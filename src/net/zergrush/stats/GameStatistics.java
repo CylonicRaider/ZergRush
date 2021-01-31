@@ -24,7 +24,7 @@ public class GameStatistics extends Statistics {
 
     static {
         KEYS = new LinkedHashSet<>();
-        XMLConverterRegistry.DEFAULT.add(GameStatistics.class,
+        XMLConverterRegistry.getDefault().add(GameStatistics.class,
             new XMLConverter<GameStatistics>() {
 
                 private <T> void decodeEntry(XMLReader rd, Entry<T> ent)
