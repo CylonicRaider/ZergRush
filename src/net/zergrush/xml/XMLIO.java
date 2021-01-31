@@ -148,7 +148,7 @@ public abstract class XMLIO {
                 if (! s.write(doc, output))
                     throw eh.augment(new IOException(
                         "Could not serialize document"));
-              } catch (DOMException exc) {
+            } catch (DOMException exc) {
                 throw new IOException(eh.augment(exc));
             } catch (LSException exc) {
                 throw new IOException(eh.augment(exc));
