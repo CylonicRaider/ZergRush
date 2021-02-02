@@ -82,6 +82,7 @@ public class XMLWriter {
     }
 
     public void enter(String name) {
+        if (name == null) throw new NullPointerException();
         curWriter = new ItemWriter(curWriter, name);
     }
 
@@ -100,13 +101,18 @@ public class XMLWriter {
         Class<T> cls = (Class<T>) value.getClass();
         registry.get(cls).writeXML(this, value);
     }
+
+    public void writeAs(Object value) throws XMLConversionException {
+        if (value == null) return;
+        dispatchWrite(value);
+    }
+
     public void write(String name, Object value)
             throws XMLConversionException {
-        if (name == null) throw new NullPointerException();
         if (value == null) return;
         enter(name);
         try {
-            dispatchWrite(value);
+            writeAs(value);
         } finally {
             exit();
         }

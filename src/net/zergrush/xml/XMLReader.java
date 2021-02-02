@@ -176,12 +176,16 @@ public class XMLReader implements Iterable<DataItem> {
         return bucket.get(0);
     }
 
+    public <T> T readAs(Class<T> cls) throws XMLConversionException {
+        if (cls == null) throw new NullPointerException();
+        return registry.get(cls).readXML(this);
+    }
+
     public <T> T read(DataItem data, Class<T> cls)
             throws XMLConversionException {
-        if (cls == null || data == null) throw new NullPointerException();
         enter(data);
         try {
-            return registry.get(cls).readXML(this);
+            return readAs(cls);
         } finally {
             exit();
         }
