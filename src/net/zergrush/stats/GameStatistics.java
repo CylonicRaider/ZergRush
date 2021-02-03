@@ -37,7 +37,7 @@ public class GameStatistics extends Statistics {
                         throws XMLConversionException {
                     boolean frozen = rd.readOnly("frozen", Boolean.class);
                     GameStatistics ret = new GameStatistics();
-                    for (DataItem item : rd.getItems("entry")) {
+                    for (DataItem item : rd.getItems("stat")) {
                         rd.enter(item);
                         try {
                             Entry<?> ent = ret.getEntryByName(
@@ -56,7 +56,7 @@ public class GameStatistics extends Statistics {
                         throws XMLConversionException {
                     wr.write("frozen", value.isFrozen());
                     for (Entry<?> ent : value.entries()) {
-                        wr.enter("entry");
+                        wr.enter("stat");
                         wr.write("key", ent.getKey().getName());
                         wr.write("value", ent.getValue());
                         wr.exit();

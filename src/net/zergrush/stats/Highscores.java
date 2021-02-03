@@ -2,14 +2,19 @@ package net.zergrush.stats;
 
 import java.util.NavigableSet;
 import java.util.TreeSet;
+import net.zergrush.xml.XMLConversionException;
+import net.zergrush.xml.XMLConverter;
+import net.zergrush.xml.XMLConverterRegistry;
+import net.zergrush.xml.XMLReader;
+import net.zergrush.xml.XMLWriter;
 
 public class Highscores {
 
     public static class Entry implements Comparable<Entry> {
 
-        private final Statistics data;
+        private final GameStatistics data;
 
-        public Entry(Statistics data) {
+        public Entry(GameStatistics data) {
             this.data = data.freeze();
         }
 
@@ -22,7 +27,7 @@ public class Highscores {
             return Long.compare(getDate(), other.getDate());
         }
 
-        public Statistics getData() {
+        public GameStatistics getData() {
             return data;
         }
 
@@ -42,6 +47,41 @@ public class Highscores {
             return data.get(GameStatistics.NAME);
         }
 
+    }
+
+    static {
+        XMLConverterRegistry.getDefault().add(Entry.class,
+            new XMLConverter<Entry>() {
+
+                public Entry readXML(XMLReader rd)
+                        throws XMLConversionException {
+                    return new Entry(rd.readAs(GameStatistics.class));
+                }
+
+                public void writeXML(XMLWriter wr, Entry ent)
+                        throws XMLConversionException {
+                    wr.writeAs(ent.getData());
+                }
+
+            });
+        XMLConverterRegistry.getDefault().add(Highscores.class,
+            new XMLConverter<Highscores>() {
+
+                public Highscores readXML(XMLReader rd)
+                        throws XMLConversionException {
+                    Highscores hs = new Highscores();
+                    for (Entry ent : rd.readAll("entry", Entry.class)) {
+                        hs.add(ent);
+                    }
+                    return hs;
+                }
+
+                public void writeXML(XMLWriter wr, Highscores hs)
+                        throws XMLConversionException {
+                    wr.writeAll("entry", hs.getEntries());
+                }
+
+            });
     }
 
     private final NavigableSet<Entry> entries;
