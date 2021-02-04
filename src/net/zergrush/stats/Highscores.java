@@ -1,5 +1,6 @@
 package net.zergrush.stats;
 
+import java.util.Collection;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 import net.zergrush.xml.XMLConversionException;
@@ -70,9 +71,7 @@ public class Highscores {
                 public Highscores readXML(XMLReader rd)
                         throws XMLConversionException {
                     Highscores hs = new Highscores();
-                    for (Entry ent : rd.readAll("entry", Entry.class)) {
-                        hs.add(ent);
-                    }
+                    hs.addAll(rd.readAll("entry", Entry.class));
                     return hs;
                 }
 
@@ -94,8 +93,16 @@ public class Highscores {
         return entries;
     }
 
+    public void clear() {
+        entries.clear();
+    }
+
     public void add(Entry ent) {
         entries.add(ent);
+    }
+
+    public void addAll(Collection<Entry> ents) {
+        entries.addAll(ents);
     }
 
 }
