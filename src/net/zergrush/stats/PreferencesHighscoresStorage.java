@@ -23,6 +23,10 @@ public class PreferencesHighscoresStorage implements HighscoresStorage {
         this(Preferences.userNodeForPackage(Game.class), DEFAULT_KEY);
     }
 
+    public Highscores createHighscores() {
+        return new Highscores();
+    }
+
     public boolean retrieveHighscores(Highscores drain) {
         String data = node.get(key, null);
         if (data == null) return false;
