@@ -16,7 +16,7 @@ public class Highscores {
         private final GameStatistics data;
 
         public Entry(GameStatistics data) {
-            this.data = data.freeze();
+            this.data = new GameStatistics(data.entries());
         }
 
         public int compareTo(Entry other) {

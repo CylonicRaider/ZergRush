@@ -1,7 +1,6 @@
 package net.zergrush.stats;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,18 +104,15 @@ public class Statistics {
         }
 
         public void setValue(T v) {
-            ensureNotFrozen();
             value = key.getType().cast(v);
             fireChangeEvent();
         }
 
         public void addListener(ChangeListener<T> l) {
-            ensureNotFrozen();
             listeners.add(l);
         }
 
         public void removeListener(ChangeListener<T> l) {
-            ensureNotFrozen();
             listeners.remove(l);
         }
 
@@ -129,26 +125,18 @@ public class Statistics {
     }
 
     private final Map<Key<?>, Entry<?>> data;
-    private final boolean frozen;
 
-    public Statistics(Collection<Entry<?>> entries, boolean frozen) {
-        if (frozen) {
-            Map<Key<?>, Entry<?>> data = new LinkedHashMap<>();
-            this.data = Collections.unmodifiableMap(data);
-        } else {
-            this.data = new LinkedHashMap<>();
-        }
-        this.frozen = frozen;
+    public Statistics(Collection<Entry<?>> entries) {
+        this.data = new LinkedHashMap<>();
         for (Entry<?> ent : entries) {
             importEntry(data, ent);
         }
     }
-    public Statistics(Map<Key<?>, Entry<?>> data, boolean frozen) {
-        this(validatedEntries(data), frozen);
+    public Statistics(Map<Key<?>, Entry<?>> data) {
+        this(validatedEntries(data));
     }
     public Statistics() {
         data = new LinkedHashMap<>();
-        frozen = false;
     }
 
     private <T> void importEntry(Map<Key<?>, Entry<?>> data, Entry<T> ent) {
@@ -188,7 +176,6 @@ public class Statistics {
     }
 
     public <T> void put(Key<T> key, T value) {
-        ensureNotFrozen();
         Entry<T> ent = getEntry(key);
         if (ent == null) {
             ent = new Entry<>(key, value);
@@ -199,12 +186,10 @@ public class Statistics {
     }
 
     public void remove(Key<?> key) {
-        ensureNotFrozen();
         data.remove(key);
     }
 
     public void clear() {
-        ensureNotFrozen();
         data.clear();
     }
 
@@ -216,20 +201,6 @@ public class Statistics {
     public void increment(Key<Double> key, double incr) {
         Entry<Double> ent = getEntry(key);
         ent.setValue(ent.getValue() + incr);
-    }
-
-    public boolean isFrozen() {
-        return frozen;
-    }
-
-    public Statistics freeze() {
-        return new Statistics(data, true);
-    }
-
-    private void ensureNotFrozen() {
-        if (frozen)
-            throw new UnsupportedOperationException("Modifying a frozen " +
-                "Statistics");
     }
 
     private static Collection<Entry<?>> validatedEntries(

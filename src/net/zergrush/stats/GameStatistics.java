@@ -35,7 +35,6 @@ public class GameStatistics extends Statistics {
 
                 public GameStatistics readXML(XMLReader rd)
                         throws XMLConversionException {
-                    boolean frozen = rd.readOnly("frozen", Boolean.class);
                     GameStatistics ret = new GameStatistics();
                     for (DataItem item : rd.getItems("stat")) {
                         rd.enter(item);
@@ -48,13 +47,11 @@ public class GameStatistics extends Statistics {
                             rd.exit();
                         }
                     }
-                    if (frozen) ret = ret.freeze();
                     return ret;
                 }
 
                 public void writeXML(XMLWriter wr, GameStatistics value)
                         throws XMLConversionException {
-                    wr.write("frozen", value.isFrozen());
                     for (Entry<?> ent : value.entries()) {
                         wr.enter("stat");
                         wr.write("key", ent.getKey().getName());
@@ -73,8 +70,8 @@ public class GameStatistics extends Statistics {
 
     private final List<ResetListener> listeners;
 
-    public GameStatistics(Collection<Entry<?>> entries, boolean frozen) {
-        super(entries, frozen);
+    public GameStatistics(Collection<Entry<?>> entries) {
+        super(entries);
         listeners = new CopyOnWriteArrayList<>();
         resetInner();
     }
@@ -107,10 +104,6 @@ public class GameStatistics extends Statistics {
         for (ResetListener l : listeners) {
             l.onStatisticsReset(this);
         }
-    }
-
-    public GameStatistics freeze() {
-        return new GameStatistics(entries(), true);
     }
 
     protected static <T> Key<T> register(Key<T> key) {
