@@ -4,7 +4,11 @@ import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -13,7 +17,9 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
+import javax.swing.text.html.FormSubmitEvent;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 
 public class HTMLPane extends JPanel implements HyperlinkListener,
@@ -25,11 +31,18 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
 
     }
 
+    public interface FormSubmitListener {
+
+        void formSubmitted(FormSubmitEvent event, Map<String, String> data);
+
+    }
+
     private static final long serialVersionUID = -1724213395749874932L;
 
     private final JScrollPane scroller;
     private final JEditorPane content;
-    private TitleChangeListener listener;
+    private TitleChangeListener titleListener;
+    private FormSubmitListener formListener;
 
     public HTMLPane() {
         scroller = new JScrollPane();
@@ -61,11 +74,23 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
     }
 
     public TitleChangeListener getTitleChangeListener() {
-        return listener;
+        return titleListener;
     }
 
     public void setTitleChangeListener(TitleChangeListener l) {
-        listener = l;
+        titleListener = l;
+    }
+
+    public FormSubmitListener getFormSubmitListener() {
+        return formListener;
+    }
+
+    public void setFormSubmitListener(FormSubmitListener l) {
+        formListener = l;
+        EditorKit ekt = content.getEditorKit();
+        if (ekt instanceof HTMLEditorKit) {
+            ((HTMLEditorKit) ekt).setAutoFormSubmission(l == null);
+        }
     }
 
     public String getTitle() {
@@ -82,6 +107,31 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
                 HTMLFrameHyperlinkEvent evt = (HTMLFrameHyperlinkEvent) e;
                 HTMLDocument doc = (HTMLDocument) content.getDocument();
                 doc.processHTMLFrameHyperlinkEvent(evt);
+            } else if (e instanceof FormSubmitEvent) {
+                final FormSubmitEvent evt = (FormSubmitEvent) e;
+                final Map<String, String> decodedData = new LinkedHashMap<>();
+                for (String item : evt.getData().split("&")) {
+                    if (item.isEmpty()) continue;
+                    String[] parts = item.split("=", 2);
+                    String key, value;
+                    try {
+                        key = URLDecoder.decode(parts[0], "utf-8");
+                        if (parts.length == 2) {
+                            value = URLDecoder.decode(parts[1], "utf-8");
+                        } else {
+                            value = null;
+                        }
+                    } catch (UnsupportedEncodingException exc) {
+                        throw new RuntimeException(exc);
+                    }
+                    decodedData.put(key, value);
+                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if (formListener != null)
+                            formListener.formSubmitted(evt, decodedData);
+                    }
+                });
             } else {
                 loadPage(e.getURL());
             }
@@ -92,8 +142,8 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         if (e.getSource() == content && e.getPropertyName().equals("page")) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (listener != null)
-                        listener.titleChanged(HTMLPane.this, getTitle());
+                    if (titleListener != null)
+                        titleListener.titleChanged(HTMLPane.this, getTitle());
                 }
             });
         }
