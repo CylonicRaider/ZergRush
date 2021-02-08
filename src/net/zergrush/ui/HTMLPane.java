@@ -31,9 +31,10 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
 
     }
 
-    public interface FormSubmitListener {
+    public interface PageActionListener {
 
-        void formSubmitted(FormSubmitEvent event, Map<String, String> data);
+        boolean pageActionInvoked(HyperlinkEvent event, URL target,
+                                  Map<String, String> formData);
 
     }
 
@@ -42,7 +43,7 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
     private final JScrollPane scroller;
     private final JEditorPane content;
     private TitleChangeListener titleListener;
-    private FormSubmitListener formListener;
+    private PageActionListener actionListener;
 
     public HTMLPane() {
         scroller = new JScrollPane();
@@ -81,16 +82,12 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         titleListener = l;
     }
 
-    public FormSubmitListener getFormSubmitListener() {
-        return formListener;
+    public PageActionListener getPageActionListener() {
+        return actionListener;
     }
 
-    public void setFormSubmitListener(FormSubmitListener l) {
-        formListener = l;
-        EditorKit ekt = content.getEditorKit();
-        if (ekt instanceof HTMLEditorKit) {
-            ((HTMLEditorKit) ekt).setAutoFormSubmission(l == null);
-        }
+    public void setPageActionListener(PageActionListener l) {
+        actionListener = l;
     }
 
     public String getTitle() {
@@ -107,9 +104,12 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
                 HTMLFrameHyperlinkEvent evt = (HTMLFrameHyperlinkEvent) e;
                 HTMLDocument doc = (HTMLDocument) content.getDocument();
                 doc.processHTMLFrameHyperlinkEvent(evt);
-            } else if (e instanceof FormSubmitEvent) {
-                final FormSubmitEvent evt = (FormSubmitEvent) e;
-                final Map<String, String> decodedData = new LinkedHashMap<>();
+                return;
+            }
+            Map<String, String> formData = null;
+            if (e instanceof FormSubmitEvent) {
+                FormSubmitEvent evt = (FormSubmitEvent) e;
+                formData = new LinkedHashMap<>();
                 for (String item : evt.getData().split("&")) {
                     if (item.isEmpty()) continue;
                     String[] parts = item.split("=", 2);
@@ -124,17 +124,15 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
                     } catch (UnsupportedEncodingException exc) {
                         throw new RuntimeException(exc);
                     }
-                    decodedData.put(key, value);
+                    formData.put(key, value);
                 }
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        if (formListener != null)
-                            formListener.formSubmitted(evt, decodedData);
-                    }
-                });
-            } else {
-                loadPage(e.getURL());
             }
+            boolean consumed = false;
+            if (actionListener != null)
+                consumed = actionListener.pageActionInvoked(e, e.getURL(),
+                                                            formData);
+            if (! consumed)
+                loadPage(e.getURL());
         }
     }
 
@@ -152,6 +150,9 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
     protected void reset() {
         EditorKit editor = content.getEditorKit();
         content.setDocument(editor.createDefaultDocument());
+        if (editor instanceof HTMLEditorKit) {
+            ((HTMLEditorKit) editor).setAutoFormSubmission(false);
+        }
     }
 
     public void loadPage(URL url) {
