@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.JEditorPane;
@@ -25,6 +26,12 @@ import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 public class HTMLPane extends JPanel implements HyperlinkListener,
         PropertyChangeListener {
 
+    public interface PageGenerator {
+
+        String renderPage(HTMLPane pane, String pageName, Object data);
+
+    }
+
     public interface TitleChangeListener {
 
         void titleChanged(HTMLPane pane, String newTitle);
@@ -42,12 +49,14 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
 
     private final JScrollPane scroller;
     private final JEditorPane content;
+    private final Map<String, PageGenerator> pageGenerators;
     private TitleChangeListener titleListener;
     private PageActionListener actionListener;
 
     public HTMLPane() {
         scroller = new JScrollPane();
         content = createContent();
+        pageGenerators = new HashMap<>();
         createUI();
     }
 
@@ -147,6 +156,18 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         }
     }
 
+    public PageGenerator getPageGenerator(String name) {
+        return pageGenerators.get(name);
+    }
+
+    public void addPageGenerator(String name, PageGenerator gen) {
+        pageGenerators.put(name, gen);
+    }
+
+    public void removePageGenerator(String name) {
+        pageGenerators.remove(name);
+    }
+
     protected void reset() {
         EditorKit editor = content.getEditorKit();
         content.setDocument(editor.createDefaultDocument());
@@ -169,6 +190,14 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         reset();
         if (text == null) return;
         content.setText(text);
+    }
+
+    public void loadGeneratedPage(String name, Object data) {
+        reset();
+        if (name == null) return;
+        PageGenerator gen = getPageGenerator(name);
+        if (gen == null) return;
+        content.setText(gen.renderPage(this, name, data));
     }
 
 }
