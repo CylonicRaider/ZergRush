@@ -156,6 +156,10 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         }
     }
 
+    public boolean hasPageGenerator(String name) {
+        return pageGenerators.containsKey(name);
+    }
+
     public PageGenerator getPageGenerator(String name) {
         return pageGenerators.get(name);
     }
