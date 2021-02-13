@@ -26,6 +26,7 @@ import javax.swing.KeyStroke;
 import javax.swing.OverlayLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.HyperlinkEvent;
 import net.zergrush.Game;
 import net.zergrush.GameUI;
 import net.zergrush.KeyboardAction;
@@ -33,7 +34,8 @@ import net.zergrush.stats.GameStatistics;
 import net.zergrush.stats.Statistics;
 
 public class MainUI extends JPanel implements GameUI,
-        GameArea.FontSizeListener, GameStatistics.ResetListener {
+        GameArea.FontSizeListener, GameStatistics.ResetListener,
+        HTMLPane.PageActionListener {
 
     protected class KeyTracker extends KeyAdapter {
 
@@ -57,6 +59,7 @@ public class MainUI extends JPanel implements GameUI,
     private final JLabel scoreMessage;
     private final Map<Integer, Integer> keyStates;
     private HTMLDialog dialog;
+    private InfoScreenCallback dialogCallback;
 
     public MainUI() {
         gameArea = new GameArea();
@@ -65,6 +68,7 @@ public class MainUI extends JPanel implements GameUI,
         scoreMessage = new JLabel();
         keyStates = new HashMap<>();
         dialog = null;
+        dialogCallback = null;
         createUI();
     }
 
@@ -140,6 +144,7 @@ public class MainUI extends JPanel implements GameUI,
             dialog.getDisplay().setPreferredSize(getSize());
             dialog.pack();
             dialog.setLocationRelativeTo(dialog.getOwner());
+            dialog.setPageActionListener(this);
         }
         return dialog;
     }
@@ -161,6 +166,24 @@ public class MainUI extends JPanel implements GameUI,
                 }
             }
         );
+    }
+
+    public boolean onPageActionInvoked(HTMLPane pane, HyperlinkEvent event,
+            String url, Map<String, String> formData) {
+        String newLocation = null;
+        if (url.startsWith("info:")) {
+            newLocation = url.substring(5);
+        }
+        if (dialogCallback != null) {
+            newLocation = dialogCallback.onInfoScreenDone(formData);
+            dialogCallback = null;
+        }
+        if (newLocation != null) {
+            showInfoScreen(newLocation);
+        } else {
+            closeWindow(dialog);
+        }
+        return true;
     }
 
     public void setGame(Game game) {
@@ -234,12 +257,20 @@ public class MainUI extends JPanel implements GameUI,
     }
 
     public void showInfoScreen(String name) {
-        showInfoScreen(getClass().getResource("/res/" + name + ".html"));
+        showInfoScreen(name, null, null);
     }
 
-    public void showInfoScreen(URL url) {
+    public void showInfoScreen(String name, Object data,
+                               InfoScreenCallback cb) {
         HTMLDialog d = getHTMLDialog();
-        d.loadPage(url);
+        if (d.getDisplay().hasPageGenerator(name)) {
+            d.getDisplay().loadGeneratedPage(name, data);
+            dialogCallback = cb;
+        } else {
+            d.getDisplay().loadPage(getClass().getResource("/res/" + name +
+                                                           ".html"));
+            dialogCallback = null;
+        }
         d.setVisible(true);
     }
 

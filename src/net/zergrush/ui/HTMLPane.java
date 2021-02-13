@@ -40,8 +40,8 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
 
     public interface PageActionListener {
 
-        boolean pageActionInvoked(HTMLPane pane, HyperlinkEvent event,
-                                  String url, Map<String, String> formData);
+        boolean onPageActionInvoked(HTMLPane pane, HyperlinkEvent event,
+                                    String url, Map<String, String> formData);
 
     }
 
@@ -138,7 +138,7 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
             }
             boolean consumed = false;
             if (actionListener != null)
-                consumed = actionListener.pageActionInvoked(this, e,
+                consumed = actionListener.onPageActionInvoked(this, e,
                     e.getDescription(), formData);
             if (! consumed)
                 loadPage(e.getURL());

@@ -55,7 +55,7 @@ public class HTMLDialog extends JDialog
         setTitle(newTitle);
     }
 
-    public boolean pageActionInvoked(HTMLPane pane, HyperlinkEvent evt,
+    public boolean onPageActionInvoked(HTMLPane pane, HyperlinkEvent evt,
             String url, Map<String, String> formData) {
         if (url.startsWith("window:")) {
             if (url.equals("window:close")) {
@@ -64,17 +64,9 @@ public class HTMLDialog extends JDialog
             return true;
         }
         if (listener != null) {
-            return listener.pageActionInvoked(pane, evt, url, formData);
+            return listener.onPageActionInvoked(pane, evt, url, formData);
         }
         return false;
-    }
-
-    public void loadPage(URL url) {
-        display.loadPage(url);
-    }
-
-    public void loadPage(String text) {
-        display.loadPage(text);
     }
 
     private static void closeOnEscape(final JDialog dialog) {
