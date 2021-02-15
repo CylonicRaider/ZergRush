@@ -16,7 +16,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
