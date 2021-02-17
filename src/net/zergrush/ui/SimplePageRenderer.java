@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public abstract class SimplePageRenderer implements HTMLPane.PageGenerator {
 
     public static final Pattern TEMPLATE_TAG =
-        Pattern.compile("\\{\\{([a-zA-Z0-9]+)\\}\\}");
+        Pattern.compile("\\{\\{([a-zA-Z0-9]+|[<>])\\}\\}");
 
     private final String template;
 
@@ -24,7 +24,10 @@ public abstract class SimplePageRenderer implements HTMLPane.PageGenerator {
     }
 
     public Map<String, String> createReplacementMap() {
-        return new HashMap<>();
+        Map<String, String> ret = new HashMap<>();
+        ret.put("<", "{{");
+        ret.put(">", "}}");
+        return ret;
     }
 
     public abstract void renderReplacements(String pageName, Object data,
