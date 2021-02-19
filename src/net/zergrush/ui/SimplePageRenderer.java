@@ -71,4 +71,18 @@ public abstract class SimplePageRenderer implements HTMLPane.PageGenerator {
         }
     }
 
+    public static String escapeHTML(String text) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0, ch; i < text.length(); i += Character.charCount(ch)) {
+            ch = text.codePointAt(i);
+            if (ch == '<' || ch == '>' || ch == '&' || ch == '"' ||
+                    ch == '\'' || ch < ' ' || ch > '~') {
+                sb.append("&#").append(ch).append(';');
+            } else {
+                sb.appendCodePoint(ch);
+            }
+        }
+        return sb.toString();
+    }
+
 }
