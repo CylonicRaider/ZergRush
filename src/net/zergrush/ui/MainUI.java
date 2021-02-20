@@ -262,7 +262,7 @@ public class MainUI extends JPanel implements GameUI,
     public void showInfoScreen(String name, Object data,
                                InfoScreenCallback cb) {
         HTMLDialog d = getHTMLDialog();
-        if (d.getDisplay().hasPageGenerator(name)) {
+        if (d.getDisplay().hasPageRenderer(name)) {
             d.getDisplay().loadGeneratedPage(name, data);
             dialogCallback = cb;
         } else {

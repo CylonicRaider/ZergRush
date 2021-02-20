@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class SimplePageRenderer implements HTMLPane.PageGenerator {
+public abstract class SimplePageRenderer implements HTMLPane.PageRenderer {
 
     public static final Pattern TEMPLATE_TAG =
         Pattern.compile("\\{\\{([a-zA-Z0-9]+|[<>])\\}\\}");
