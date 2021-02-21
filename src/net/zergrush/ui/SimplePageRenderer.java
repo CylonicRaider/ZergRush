@@ -23,15 +23,15 @@ public abstract class SimplePageRenderer implements HTMLPane.PageRenderer {
         template = readResource(templateLocation, StandardCharsets.UTF_8);
     }
 
-    public Map<String, String> createReplacementMap() {
+    protected Map<String, String> createReplacementMap() {
         Map<String, String> ret = new HashMap<>();
         ret.put("<", "{{");
         ret.put(">", "}}");
         return ret;
     }
 
-    public abstract void renderReplacements(String pageName, Object data,
-                                            Map<String, String> drain);
+    protected abstract void renderReplacements(String pageName, Object data,
+                                               Map<String, String> drain);
 
     public String renderPage(HTMLPane pane, String name, Object data) {
         Map<String, String> replacements = createReplacementMap();
@@ -40,9 +40,7 @@ public abstract class SimplePageRenderer implements HTMLPane.PageRenderer {
         Matcher m = TEMPLATE_TAG.matcher(template);
         while (m.find()) {
             m.appendReplacement(sb, "");
-            String replacement = replacements.get(m.group(1));
-            if (replacement == null) replacement = "";
-            sb.append(replacement);
+            sb.append(getOrEmpty(replacements, m.group(1)));
         }
         m.appendTail(sb);
         return sb.toString();
@@ -69,6 +67,12 @@ public abstract class SimplePageRenderer implements HTMLPane.PageRenderer {
         } finally {
             input.close();
         }
+    }
+
+    public static String getOrEmpty(Map<?, String> map, Object key) {
+        String ret = map.get(key);
+        if (ret == null) ret = "";
+        return ret;
     }
 
     public static String escapeHTML(String text) {
