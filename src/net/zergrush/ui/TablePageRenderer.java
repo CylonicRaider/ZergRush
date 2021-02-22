@@ -18,9 +18,9 @@ public abstract class TablePageRenderer<T> extends SimplePageRenderer {
 
     protected abstract void renderHeaders(List<String> drain);
 
-    protected abstract Iterator<T> getDataIterator();
+    protected abstract Iterator<T> getDataIterator(Object data);
 
-    protected abstract void renderRow(T data, List<String> drain);
+    protected abstract void renderRow(T item, List<String> drain);
 
     protected void renderReplacements(String pageName, Object data,
                                       Map<String, String> drain) {
@@ -34,7 +34,7 @@ public abstract class TablePageRenderer<T> extends SimplePageRenderer {
             tb.append("<th>").append(header).append("</th>");
         }
         tb.append("</tr>\n");
-        Iterator<T> di = getDataIterator();
+        Iterator<T> di = getDataIterator(data);
         while (di.hasNext()) {
             tb.append("<tr>");
             rowDrain.clear();
