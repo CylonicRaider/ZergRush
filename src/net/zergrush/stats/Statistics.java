@@ -8,6 +8,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Statistics {
 
+    public interface Displayer<T> {
+
+        String display(T value);
+
+    }
+
     public interface ChangeListener<T> {
 
         void valueChanged(Entry<T> ent);
@@ -68,27 +74,33 @@ public class Statistics {
         private final Key<T> key;
         private String description;
         private T value;
+        private Displayer<? super T> displayer;
         private final List<ChangeListener<T>> listeners;
 
-        public Entry(Key<T> key, String description, T value) {
+        public Entry(Key<T> key, String description, T value,
+                     Displayer<? super T> displayer) {
             this.key = key;
             this.description = description;
             this.value = key.getType().cast(value);
+            this.displayer = displayer;
             this.listeners = new CopyOnWriteArrayList<>();
         }
         public Entry(Key<T> key, T value) {
-            this(key, null, value);
+            this(key, null, value, null);
         }
 
         public Statistics getParent() {
             return Statistics.this;
         }
 
-        public void init(String description) {
-            if (this.description != null)
+        public void init(String description, Displayer<? super T> displayer) {
+            if (description == null || displayer == null)
+                throw new NullPointerException();
+            if (this.description != null && this.displayer != null)
                 throw new IllegalStateException("Statistics entry already " +
                     "initialized");
             this.description = description;
+            this.displayer = displayer;
         }
 
         public Key<T> getKey() {
@@ -108,6 +120,14 @@ public class Statistics {
             fireChangeEvent();
         }
 
+        public Displayer<? super T> getDisplayer() {
+            return displayer;
+        }
+
+        public String getDisplayerValue() {
+            return displayer.display(value);
+        }
+
         public void addListener(ChangeListener<T> l) {
             listeners.add(l);
         }
@@ -124,12 +144,19 @@ public class Statistics {
 
     }
 
+    public static final Displayer<Object> DEFAULT_DISPLAYER =
+        new Displayer<Object>() {
+            public String display(Object value) {
+                return String.valueOf(value);
+            }
+        };
+
     private final Map<Key<?>, Entry<?>> data;
 
     public Statistics(Collection<Entry<?>> entries) {
         this.data = new LinkedHashMap<>();
         for (Entry<?> ent : entries) {
-            importEntry(data, ent);
+            importEntry(ent, data);
         }
     }
     public Statistics(Map<Key<?>, Entry<?>> data) {
@@ -139,11 +166,11 @@ public class Statistics {
         data = new LinkedHashMap<>();
     }
 
-    private <T> void importEntry(Map<Key<?>, Entry<?>> data, Entry<T> ent) {
+    private <T> void importEntry(Entry<T> ent, Map<Key<?>, Entry<?>> drain) {
         // We need to outline this into a method in order to be able to name
         // the type variable.
-        data.put(ent.getKey(), new Entry<>(ent.getKey(),
-            ent.getDescription(), ent.getValue()));
+        drain.put(ent.getKey(), new Entry<>(ent.getKey(),
+            ent.getDescription(), ent.getValue(), ent.getDisplayer()));
     }
 
     public <T> Entry<T> getEntry(Key<T> key) {
@@ -160,13 +187,15 @@ public class Statistics {
         return data.values();
     }
 
-    public <T> Entry<T> init(Key<T> key, String description, T defValue) {
+    public <T> Entry<T> init(Key<T> key, String description, T defValue,
+                             Displayer<? super T> displayer) {
+        if (displayer == null) displayer = DEFAULT_DISPLAYER;
         Entry<T> ent = getEntry(key);
         if (ent == null) {
             ent = new Entry<>(key, defValue);
             data.put(key, ent);
         }
-        ent.init(description);
+        ent.init(description, displayer);
         return ent;
     }
 

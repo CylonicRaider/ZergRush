@@ -95,9 +95,9 @@ public class GameStatistics extends Statistics {
     }
 
     protected void resetInner() {
-        init(SCORE, "Points reached", 0);
-        init(STARTED, "Game started", System.currentTimeMillis());
-        init(ENDED, "Game ended", Long.MAX_VALUE);
+        init(SCORE, "Points reached", 0, null);
+        init(STARTED, "Game started", System.currentTimeMillis(), null);
+        init(ENDED, "Game ended", Long.MAX_VALUE, null);
     }
 
     protected void fireResetListeners() {
