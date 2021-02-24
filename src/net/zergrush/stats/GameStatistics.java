@@ -3,6 +3,7 @@ package net.zergrush.stats;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import net.zergrush.xml.DataItem;
@@ -21,9 +22,15 @@ public class GameStatistics extends Statistics {
     }
 
     protected static final Set<Key<?>> KEYS;
+    protected static final Displayer<Long> DATE_DISPLAYER;
 
     static {
         KEYS = new LinkedHashSet<>();
+        DATE_DISPLAYER = new Displayer<Long>() {
+            public String display(Long value) {
+                return String.format((Locale) null, "%TF %<tT %<tZ", value);
+            }
+        };
         XMLConverterRegistry.getDefault().add(GameStatistics.class,
             new XMLConverter<GameStatistics>() {
 
@@ -96,8 +103,9 @@ public class GameStatistics extends Statistics {
 
     protected void resetInner() {
         init(SCORE, "Points reached", 0, null);
-        init(STARTED, "Game started", System.currentTimeMillis(), null);
-        init(ENDED, "Game ended", Long.MAX_VALUE, null);
+        init(STARTED, "Game started", System.currentTimeMillis(),
+             DATE_DISPLAYER);
+        init(ENDED, "Game ended", Long.MAX_VALUE, DATE_DISPLAYER);
     }
 
     protected void fireResetListeners() {
