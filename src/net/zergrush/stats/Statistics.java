@@ -124,7 +124,7 @@ public class Statistics {
             return displayer;
         }
 
-        public String getDisplayerValue() {
+        public String getDisplayedValue() {
             return displayer.display(value);
         }
 
