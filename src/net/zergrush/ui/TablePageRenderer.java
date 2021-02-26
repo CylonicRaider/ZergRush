@@ -8,8 +8,8 @@ import java.util.Map;
 
 public abstract class TablePageRenderer<T> extends SimplePageRenderer {
 
-    public TablePageRenderer() throws IOException {
-        super(TablePageRenderer.class.getResource("/res/template.html"));
+    public TablePageRenderer() {
+        super(TablePageRenderer.class, "/res/template.html");
     }
 
     protected List<String> createRowList() {

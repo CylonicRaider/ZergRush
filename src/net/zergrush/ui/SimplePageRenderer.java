@@ -19,8 +19,15 @@ public abstract class SimplePageRenderer implements HTMLPane.PageRenderer {
 
     private final String template;
 
+    public SimplePageRenderer(String template) {
+        this.template = template;
+    }
     public SimplePageRenderer(URL templateLocation) throws IOException {
-        template = readResource(templateLocation, StandardCharsets.UTF_8);
+        this(readResource(templateLocation, StandardCharsets.UTF_8));
+    }
+    public SimplePageRenderer(Class<?> reference, String resourceName) {
+        this(readResourceOrBailOut(reference.getResource(resourceName),
+                                   StandardCharsets.UTF_8));
     }
 
     protected Map<String, String> createReplacementMap() {
@@ -66,6 +73,13 @@ public abstract class SimplePageRenderer implements HTMLPane.PageRenderer {
             return new String(buf, 0, length);
         } finally {
             input.close();
+        }
+    }
+    private static String readResourceOrBailOut(URL location, Charset cs) {
+        try {
+            return readResource(location, cs);
+        } catch (IOException exc) {
+            throw new RuntimeException(exc);
         }
     }
 
