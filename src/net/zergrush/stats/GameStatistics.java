@@ -26,11 +26,7 @@ public class GameStatistics extends Statistics {
 
     static {
         KEYS = new LinkedHashSet<>();
-        DATE_DISPLAYER = new Displayer<Long>() {
-            public String display(Long value) {
-                return String.format((Locale) null, "%TF %<tT %<tZ", value);
-            }
-        };
+        DATE_DISPLAYER = new SimpleDisplayer<Long>("%tF %<tT %<tZ");
         XMLConverterRegistry.getDefault().add(GameStatistics.class,
             new XMLConverter<GameStatistics>() {
 
