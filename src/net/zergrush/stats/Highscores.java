@@ -83,6 +83,8 @@ public class Highscores {
             });
     }
 
+    public static final int MAX_SIZE = 10;
+
     private final NavigableSet<Entry> entries;
 
     public Highscores() {
