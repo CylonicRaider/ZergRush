@@ -1,6 +1,9 @@
 package net.zergrush.stats;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 import net.zergrush.xml.XMLConversionException;
@@ -50,6 +53,21 @@ public class Highscores {
 
     }
 
+    public static class NumberedEntry extends Entry {
+
+        private final int index;
+
+        public NumberedEntry(GameStatistics data, int index) {
+            super(data);
+            this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+    }
+
     static {
         XMLConverterRegistry.getDefault().add(Entry.class,
             new XMLConverter<Entry>() {
@@ -93,6 +111,16 @@ public class Highscores {
 
     public NavigableSet<Entry> getEntries() {
         return entries;
+    }
+
+    public List<NumberedEntry> getTopEntries(int amount) {
+        List<NumberedEntry> ret = new ArrayList<>(amount);
+        Iterator<Entry> topEntries = getEntries().iterator();
+        while (topEntries.hasNext() && ret.size() < amount) {
+            ret.add(new NumberedEntry(topEntries.next().getData(),
+                                      ret.size()));
+        }
+        return ret;
     }
 
     public void clear() {

@@ -6,40 +6,7 @@ import java.util.Map;
 import net.zergrush.stats.Highscores;
 
 public class HighscoresPageRenderer
-        extends TablePageRenderer<
-            HighscoresPageRenderer.NumberedHighscoresEntry> {
-
-    static class NumberedHighscoresEntry {
-
-        private final int index;
-        private final Highscores.Entry entry;
-
-        public NumberedHighscoresEntry(int index, Highscores.Entry entry) {
-            this.index = index;
-            this.entry = entry;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public Highscores.Entry getEntry() {
-            return entry;
-        }
-
-        public String getName() {
-            return entry.getName();
-        }
-
-        public int getScore() {
-            return entry.getScore();
-        }
-
-        public long getDate() {
-            return entry.getDate();
-        }
-
-    }
+        extends TablePageRenderer<Highscores.NumberedEntry> {
 
     protected void renderHeaders(List<String> drain) {
         drain.add("#");
@@ -47,33 +14,15 @@ public class HighscoresPageRenderer
         drain.add("Score");
     }
 
-    protected Iterator<NumberedHighscoresEntry> getDataIterator(Object data) {
-        final Iterator<Highscores.Entry> hsEntries =
-            ((Highscores) data).getEntries().iterator();
-        return new Iterator<NumberedHighscoresEntry>() {
-
-            int counter = 1;
-
-            public boolean hasNext() {
-                return counter <= Highscores.MAX_SIZE && hsEntries.hasNext();
-            }
-
-            public NumberedHighscoresEntry next() {
-                return new NumberedHighscoresEntry(counter++,
-                                                   hsEntries.next());
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException(
-                    "May not remove from highscores");
-            }
-
-        };
+    protected Iterator<Highscores.NumberedEntry> getDataIterator(
+            Object data) {
+        Highscores hs = (Highscores) data;
+        return hs.getTopEntries(Highscores.MAX_SIZE).iterator();
     }
 
-    protected void renderRow(NumberedHighscoresEntry item,
+    protected void renderRow(Highscores.NumberedEntry item,
                              List<String> drain) {
-        drain.add(String.valueOf(item.getIndex()));
+        drain.add(String.valueOf(item.getIndex() + 1));
         drain.add(escapeHTML(item.getName()));
         drain.add(escapeHTML(String.valueOf(item.getScore())));
     }
