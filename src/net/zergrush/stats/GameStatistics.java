@@ -3,7 +3,6 @@ package net.zergrush.stats;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import net.zergrush.xml.DataItem;

@@ -1,9 +1,9 @@
 package net.zergrush.ui;
 
-import java.util.Map;
-import java.util.List;
-import net.zergrush.stats.Highscores;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import net.zergrush.stats.Highscores;
 
 public class HighscoresPageRenderer
         extends TablePageRenderer<
