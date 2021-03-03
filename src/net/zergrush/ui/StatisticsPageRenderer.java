@@ -1,30 +1,19 @@
 package net.zergrush.ui;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import net.zergrush.stats.Statistics;
 
-public class StatisticsPageRenderer
-        extends TablePageRenderer<Statistics.Entry<?>> {
+public class StatisticsPageRenderer extends TablePageRenderer {
 
-    protected void renderHeaders(List<String> drain) {
-        drain.add("Statistic");
-        drain.add("Value");
-    }
-
-    protected Iterator<Statistics.Entry<?>> getDataIterator(Object data) {
-        return ((Statistics) data).entries().iterator();
-    }
-
-    private <T> void renderRowInner(Statistics.Entry<T> item,
-                                    List<String> drain) {
-        drain.add(escapeHTML(item.getDescription()));
-        drain.add(escapeHTML(item.getDisplayedValue()));
-    }
-
-    protected void renderRow(Statistics.Entry<?> item, List<String> drain) {
-        renderRowInner(item, drain);
+    protected void renderCells(Object data, CellWriter writer) {
+        writer.header("Statistic");
+        writer.header("Value");
+        writer.finishRow();
+        for (Statistics.Entry<?> item : ((Statistics) data).entries()) {
+            writer.dataEsc(item.getDescription());
+            writer.dataEsc(item.getDisplayedValue());
+            writer.finishRow();
+        }
     }
 
     protected void renderReplacements(String pageName, Object data,

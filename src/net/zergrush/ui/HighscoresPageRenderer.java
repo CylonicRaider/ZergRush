@@ -1,30 +1,24 @@
 package net.zergrush.ui;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import net.zergrush.stats.Highscores;
 
-public class HighscoresPageRenderer
-        extends TablePageRenderer<Highscores.NumberedEntry> {
+public class HighscoresPageRenderer extends TablePageRenderer {
 
-    protected void renderHeaders(List<String> drain) {
-        drain.add("#");
-        drain.add("Name");
-        drain.add("Score");
-    }
-
-    protected Iterator<Highscores.NumberedEntry> getDataIterator(
-            Object data) {
-        Highscores hs = (Highscores) data;
-        return hs.getTopEntries(Highscores.MAX_SIZE).iterator();
-    }
-
-    protected void renderRow(Highscores.NumberedEntry item,
-                             List<String> drain) {
-        drain.add(String.valueOf(item.getIndex() + 1));
-        drain.add(escapeHTML(item.getName()));
-        drain.add(escapeHTML(String.valueOf(item.getScore())));
+    protected void renderCells(Object data, CellWriter writer) {
+        writer.header("#");
+        writer.header("Name");
+        writer.header("Score");
+        writer.nextRow();
+        List<Highscores.NumberedEntry> top = ((Highscores) data)
+            .getTopEntries(Highscores.MAX_SIZE);
+        for (Highscores.NumberedEntry item : top) {
+            writer.dataEsc(item.getIndex() + 1);
+            writer.dataEsc(item.getName());
+            writer.dataEsc(item.getScore());
+            writer.nextRow();
+        }
     }
 
     protected void renderReplacements(String pageName, Object data,
