@@ -22,6 +22,10 @@ public class Highscores {
             this.data = new GameStatistics(data.entries());
         }
 
+        public boolean equals(Object other) {
+            return (other instanceof Entry && compareTo((Entry) other) == 0);
+        }
+
         public int compareTo(Entry other) {
             // We sort by descending score and ascending date; thus, matching
             // a score present in the highscores might not be sufficient to
