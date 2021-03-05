@@ -60,12 +60,18 @@ public abstract class TablePageRenderer extends SimplePageRenderer {
                                       Map<String, String> drain) {
         StringBuilder tb = new StringBuilder();
         tb.append(getOrEmpty(drain, "content_top"));
+        boolean form = Boolean.parseBoolean(drain.get("form"));
+        if (form)
+            tb.append("<form action=\"\" method=\"post\" " +
+                "enctype=\"application/x-www-form-urlencoded\">");
         tb.append("<table border=\"0\" cellpadding=\"0\" " +
             "cellspacing=\"0\">\n<tr>");
         CellWriter writer = new CellWriter(tb);
         renderCells(data, writer);
         writer.finishRow();
         tb.append("</table>\n");
+        if (form)
+            tb.append("</form>\n");
         tb.append(getOrEmpty(drain, "content_bottom"));
         drain.put("content", tb.toString());
         if (! drain.containsKey("window_title")) {
