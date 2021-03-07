@@ -119,12 +119,23 @@ public class Highscores {
 
     public List<NumberedEntry> getTopEntries(int amount) {
         List<NumberedEntry> ret = new ArrayList<>(amount);
-        Iterator<Entry> topEntries = getEntries().iterator();
+        Iterator<Entry> topEntries = entries.iterator();
         while (topEntries.hasNext() && ret.size() < amount) {
             ret.add(new NumberedEntry(topEntries.next().getData(),
                                       ret.size()));
         }
         return ret;
+    }
+
+    public NumberedEntry getTopEntry(int index) {
+        if (index < 0)
+            throw new IndexOutOfBoundsException("index may not be negative");
+        int counter = 0;
+        for (Entry ent : entries) {
+            if (counter++ == index)
+                return new NumberedEntry(ent.getData(), index);
+        }
+        throw new IndexOutOfBoundsException("index too large");
     }
 
     public void clear() {
