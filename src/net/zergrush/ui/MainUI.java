@@ -137,6 +137,11 @@ public class MainUI extends JPanel implements GameUI,
         layout.setHgap(Math.max(metrics.getHeight(), 1));
     }
 
+    protected void registerPageRenderers(HTMLPane pane) {
+        pane.addPageRenderer("statistics", new StatisticsPageRenderer());
+        pane.addPageRenderer("highscores", new HighscoresPageRenderer());
+    }
+
     public HTMLDialog getHTMLDialog() {
         if (dialog == null) {
             dialog = new HTMLDialog(SwingUtilities.getWindowAncestor(this));
@@ -144,6 +149,7 @@ public class MainUI extends JPanel implements GameUI,
             dialog.pack();
             dialog.setLocationRelativeTo(dialog.getOwner());
             dialog.setPageActionListener(this);
+            registerPageRenderers(dialog.getDisplay());
         }
         return dialog;
     }
