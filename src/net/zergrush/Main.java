@@ -2,6 +2,7 @@ package net.zergrush;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import net.zergrush.stats.PreferencesHighscoresStorage;
 import net.zergrush.ui.MainUI;
 
 public class Main {
@@ -10,7 +11,8 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 MainUI ui = new MainUI();
-                final Game game = new Game(ui);
+                final Game game = new Game(
+                    PreferencesHighscoresStorage.getDefault(), ui);
                 final JFrame win = MainUI.createWindow(ui);
                 win.setVisible(true);
                 MainUI.scheduleRepeatedly(new Runnable() {

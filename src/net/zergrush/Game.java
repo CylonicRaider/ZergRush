@@ -15,6 +15,7 @@ import net.zergrush.sprites.Player;
 import net.zergrush.sprites.Sprite;
 import net.zergrush.sprites.Zerg;
 import net.zergrush.stats.GameStatistics;
+import net.zergrush.stats.HighscoresStorage;
 
 public class Game {
 
@@ -24,6 +25,7 @@ public class Game {
     public static final double ZERG_SPAWN_COUNTER = 60;
     public static final double ZERG_SPAWN_COUNTER_DECR = 0.995;
 
+    private final HighscoresStorage hsStorage;
     private final GameUI ui;
     private final GameStatistics stats;
     private final Queue<Runnable> runQueue;
@@ -34,7 +36,8 @@ public class Game {
     private int zergSpawnCounter;
     private double nextZergSpawnCounter;
 
-    public Game(GameUI ui) {
+    public Game(HighscoresStorage hsStorage, GameUI ui) {
+        this.hsStorage = hsStorage;
         this.ui = ui;
         this.stats = new GameStatistics();
         this.runQueue = new ConcurrentLinkedQueue<>();
