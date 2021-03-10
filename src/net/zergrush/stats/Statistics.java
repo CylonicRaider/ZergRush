@@ -162,6 +162,9 @@ public class Statistics {
     public Statistics(Map<Key<?>, Entry<?>> data) {
         this(validatedEntries(data));
     }
+    public Statistics(Statistics copyFrom) {
+        this(copyFrom.entries());
+    }
     public Statistics() {
         data = new LinkedHashMap<>();
     }
