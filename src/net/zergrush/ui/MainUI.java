@@ -176,7 +176,7 @@ public class MainUI extends JPanel implements GameUI,
     public boolean onPageActionInvoked(HTMLPane pane, HyperlinkEvent event,
             String url, Map<String, String> formData) {
         String newLocation = null;
-        if (url.startsWith("info:")) {
+        if (url != null && url.startsWith("info:")) {
             newLocation = url.substring(5);
         }
         if (dialogCallback != null) {

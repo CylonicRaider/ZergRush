@@ -67,7 +67,7 @@ public abstract class TablePageRenderer extends SimplePageRenderer {
             tb.append(getOrEmpty(drain, "form_top"));
         }
         tb.append("<table border=\"0\" cellpadding=\"0\" " +
-            "cellspacing=\"0\">\n<tr>");
+            "cellspacing=\"0\" width=\"100%\">\n");
         CellWriter writer = new CellWriter(tb);
         renderCells(data, writer);
         writer.finishRow();

@@ -15,19 +15,27 @@ import java.util.regex.Pattern;
 public abstract class SimplePageRenderer implements HTMLPane.PageRenderer {
 
     public static final Pattern TEMPLATE_TAG =
-        Pattern.compile("\\{\\{([a-zA-Z0-9]+|[<>])\\}\\}");
+        Pattern.compile("\\{\\{([a-zA-Z0-9_]+|[<>])\\}\\}");
 
+    private final URL base;
     private final String template;
 
-    public SimplePageRenderer(String template) {
+    public SimplePageRenderer(URL base, String template) {
+        this.base = base;
         this.template = template;
     }
     public SimplePageRenderer(URL templateLocation) throws IOException {
-        this(readResource(templateLocation, StandardCharsets.UTF_8));
+        this(templateLocation,
+             readResource(templateLocation, StandardCharsets.UTF_8));
     }
     public SimplePageRenderer(Class<?> reference, String resourceName) {
-        this(readResourceOrBailOut(reference.getResource(resourceName),
+        this(reference.getResource(resourceName),
+             readResourceOrBailOut(reference.getResource(resourceName),
                                    StandardCharsets.UTF_8));
+    }
+
+    public URL getBaseURL() {
+        return base;
     }
 
     protected Map<String, String> createReplacementMap() {
@@ -83,10 +91,12 @@ public abstract class SimplePageRenderer implements HTMLPane.PageRenderer {
         }
     }
 
+    public static String nullToEmpty(String value) {
+        return (value == null) ? "" : value;
+    }
+
     public static String getOrEmpty(Map<?, String> map, Object key) {
-        String ret = map.get(key);
-        if (ret == null) ret = "";
-        return ret;
+        return nullToEmpty(map.get(key));
     }
 
     public static String escapeHTML(String text) {

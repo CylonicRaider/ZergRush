@@ -29,7 +29,7 @@ public class HighscoresPageRenderer extends TablePageRenderer {
             writer.dataEsc(item.getIndex() + 1);
             if (item.getIndex() == selectIndex) {
                 writer.data("<input type=\"text\" name=\"name\" value=\"" +
-                    escapeHTML(item.getName()) + "\"/>");
+                    escapeHTML(nullToEmpty(item.getName())) + "\"/>");
             } else {
                 writer.dataEsc(item.getName());
             }

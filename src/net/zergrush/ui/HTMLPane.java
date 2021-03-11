@@ -28,6 +28,8 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
 
     public interface PageRenderer {
 
+        URL getBaseURL();
+
         String renderPage(HTMLPane pane, String pageName, Object data);
 
     }
@@ -107,42 +109,43 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
 
     public void hyperlinkUpdate(HyperlinkEvent e) {
         // Code adapted from JEditorPane docs.
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED &&
-                e.getSource() == content) {
-            if (e instanceof HTMLFrameHyperlinkEvent) {
-                HTMLFrameHyperlinkEvent evt = (HTMLFrameHyperlinkEvent) e;
-                HTMLDocument doc = (HTMLDocument) content.getDocument();
+        if (e.getEventType() != HyperlinkEvent.EventType.ACTIVATED)
+            return;
+        if (e instanceof HTMLFrameHyperlinkEvent) {
+            HTMLFrameHyperlinkEvent evt = (HTMLFrameHyperlinkEvent) e;
+            HTMLDocument doc = (HTMLDocument) content.getDocument();
+            if (! evt.getTarget().equals("_self")) {
                 doc.processHTMLFrameHyperlinkEvent(evt);
                 return;
             }
-            Map<String, String> formData = null;
-            if (e instanceof FormSubmitEvent) {
-                FormSubmitEvent evt = (FormSubmitEvent) e;
-                formData = new LinkedHashMap<>();
-                for (String item : evt.getData().split("&")) {
-                    if (item.isEmpty()) continue;
-                    String[] parts = item.split("=", 2);
-                    String key, value;
-                    try {
-                        key = URLDecoder.decode(parts[0], "utf-8");
-                        if (parts.length == 2) {
-                            value = URLDecoder.decode(parts[1], "utf-8");
-                        } else {
-                            value = null;
-                        }
-                    } catch (UnsupportedEncodingException exc) {
-                        throw new RuntimeException(exc);
-                    }
-                    formData.put(key, value);
-                }
-            }
-            boolean consumed = false;
-            if (actionListener != null)
-                consumed = actionListener.onPageActionInvoked(this, e,
-                    e.getDescription(), formData);
-            if (! consumed)
-                loadPage(e.getURL());
         }
+        Map<String, String> formData = null;
+        if (e instanceof FormSubmitEvent) {
+            FormSubmitEvent evt = (FormSubmitEvent) e;
+            formData = new LinkedHashMap<>();
+            for (String item : evt.getData().split("&")) {
+                if (item.isEmpty()) continue;
+                String[] parts = item.split("=", 2);
+                String key, value;
+                try {
+                    key = URLDecoder.decode(parts[0], "utf-8");
+                    if (parts.length == 2) {
+                        value = URLDecoder.decode(parts[1], "utf-8");
+                    } else {
+                        value = null;
+                    }
+                } catch (UnsupportedEncodingException exc) {
+                    throw new RuntimeException(exc);
+                }
+                formData.put(key, value);
+            }
+        }
+        boolean consumed = false;
+        if (actionListener != null)
+            consumed = actionListener.onPageActionInvoked(this, e,
+                e.getDescription(), formData);
+        if (! consumed)
+            loadPage(e.getURL());
     }
 
     public void propertyChange(PropertyChangeEvent e) {
@@ -201,6 +204,9 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         if (name == null) return;
         PageRenderer gen = getPageRenderer(name);
         if (gen == null) return;
+        URL baseURL = gen.getBaseURL();
+        if (baseURL != null && content.getDocument() instanceof HTMLDocument)
+            ((HTMLDocument) content.getDocument()).setBase(baseURL);
         content.setText(gen.renderPage(this, name, data));
     }
 

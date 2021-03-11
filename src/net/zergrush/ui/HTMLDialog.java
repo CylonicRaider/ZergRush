@@ -56,7 +56,7 @@ public class HTMLDialog extends JDialog
 
     public boolean onPageActionInvoked(HTMLPane pane, HyperlinkEvent evt,
             String url, Map<String, String> formData) {
-        if (url.startsWith("window:")) {
+        if (url != null && url.startsWith("window:")) {
             if (url.equals("window:close")) {
                 MainUI.closeWindow(this);
             }
