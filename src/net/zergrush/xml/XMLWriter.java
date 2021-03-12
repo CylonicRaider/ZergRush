@@ -27,10 +27,40 @@ public class XMLWriter {
             return parent;
         }
 
+        public String getName() {
+            return name;
+        }
+
         public void add(DataItem item) {
             if (! buffer.containsKey(item.getName()))
                 buffer.put(item.getName(), new ArrayList<DataItem>());
             buffer.get(item.getName()).add(item);
+        }
+
+        public void aggregateInto(Element drain) {
+            if (! drain.getTagName().equals(name))
+                throw new RuntimeException("Wrong XML element name " +
+                    "(expected " + name + "; got " + drain.getTagName() +
+                    ")");
+            for (Map.Entry<String, List<DataItem>> pair : buffer.entrySet()) {
+                List<DataItem> items = pair.getValue();
+                if (items.size() == 1 && items.get(0).isAttribute()) {
+                    drain.setAttribute(pair.getKey(),
+                                       items.get(0).getAttributeValue());
+                    continue;
+                }
+                for (DataItem item : items) {
+                    if (item.isAttribute()) {
+                        Element inflatedItem = document.createElement(
+                            pair.getKey());
+                        inflatedItem.setAttribute("value",
+                                                  item.getAttributeValue());
+                        drain.appendChild(inflatedItem);
+                    } else {
+                        drain.appendChild(item.getElementValue());
+                    }
+                }
+            }
         }
 
         public DataItem aggregate(boolean forceElement) {
@@ -45,25 +75,7 @@ public class XMLWriter {
                 }
             }
             Element res = document.createElement(name);
-            for (Map.Entry<String, List<DataItem>> pair : buffer.entrySet()) {
-                List<DataItem> items = pair.getValue();
-                if (items.size() == 1 && items.get(0).isAttribute()) {
-                    res.setAttribute(pair.getKey(),
-                                     items.get(0).getAttributeValue());
-                    continue;
-                }
-                for (DataItem item : items) {
-                    if (item.isAttribute()) {
-                        Element inflatedItem = document.createElement(
-                            pair.getKey());
-                        inflatedItem.setAttribute("value",
-                                                  item.getAttributeValue());
-                        res.appendChild(inflatedItem);
-                    } else {
-                        res.appendChild(item.getElementValue());
-                    }
-                }
-            }
+            aggregateInto(res);
             return new DataItem(res);
         }
 
@@ -81,8 +93,13 @@ public class XMLWriter {
         this.curWriter = null;
     }
 
-    public void enter(String name) {
+    public void enter(String name) throws XMLConversionException {
         if (name == null) throw new NullPointerException();
+        if (curWriter == null && document.getDocumentElement() != null &&
+                ! document.getDocumentElement().getTagName().equals(name))
+            throw new XMLConversionException("Document root has wrong name " +
+                "(expected " + name + "; got " +
+                document.getDocumentElement().getTagName() + ")");
         curWriter = new ItemWriter(curWriter, name);
     }
 
@@ -99,7 +116,11 @@ public class XMLWriter {
         // with value, but that is not expressible in Java's type system.
         @SuppressWarnings("unchecked")
         Class<T> cls = (Class<T>) value.getClass();
-        registry.get(cls).writeXML(this, value);
+        XMLConverter<T> converter = registry.get(cls);
+        if (converter == null)
+            throw new XMLConversionException("Cannot convert type " +
+                cls.getName());
+        converter.writeXML(this, value);
     }
 
     public void writeAs(Object value) throws XMLConversionException {
@@ -121,7 +142,12 @@ public class XMLWriter {
     public void exit() {
         ItemWriter parent = curWriter.getParent();
         if (parent == null) {
-            document.appendChild(curWriter.aggregate(true).getElementValue());
+            Element root = document.getDocumentElement();
+            if (root == null) {
+                root = document.createElement(curWriter.getName());
+                document.appendChild(root);
+            }
+            curWriter.aggregateInto(root);
         } else {
             parent.add(curWriter.aggregate(false));
         }

@@ -68,9 +68,9 @@ public abstract class XMLIO {
 
         public static class StoringErrorHandler implements DOMErrorHandler {
 
-            private DOMError error;
+            private DOMErrorException error;
 
-            public DOMError getError() {
+            public DOMErrorException getError() {
                 return error;
             }
 
@@ -81,8 +81,10 @@ public abstract class XMLIO {
             public boolean handleError(DOMError error) {
                 if (error.getSeverity() == DOMError.SEVERITY_WARNING)
                     return true;
+                // Storing a wrapping exception instead of the error allows us
+                // to (hopefully) capture all the gory stack trace details.
                 if (this.error == null)
-                    this.error = error;
+                    this.error = new DOMErrorException(error);
                 // Behold this *exceptionally wise* design decision: "If an
                 // exception is thrown from this method, it is considered to
                 // be equivalent of returning true [i.e. continuing
@@ -97,7 +99,7 @@ public abstract class XMLIO {
                 // We expect the pertinent exceptions not to have a cause;
                 // however, it might be more appropriate to add the
                 // DOMErrorException as a suppressed exception instead anyway.
-                if (error != null) t.initCause(new DOMErrorException(error));
+                if (error != null) t.initCause(error);
                 return t;
             }
 
@@ -117,8 +119,8 @@ public abstract class XMLIO {
             this(getDefaultImplementation());
         }
 
-        public Document createDocument() {
-            return impl.createDocument(null, null, null);
+        public Document createDocument(String rootNodeName) {
+            return impl.createDocument(null, rootNodeName, null);
         }
 
         public Document read(Reader source) throws IOException {
@@ -172,7 +174,7 @@ public abstract class XMLIO {
 
     }
 
-    public abstract Document createDocument();
+    public abstract Document createDocument(String rootNodeName);
 
     public abstract Document read(Reader source) throws IOException;
 

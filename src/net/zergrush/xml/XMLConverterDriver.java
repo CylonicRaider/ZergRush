@@ -32,7 +32,7 @@ public class XMLConverterDriver {
     public XMLIO getIO() {
         return io;
     }
-    public void setUI(XMLIO io) {
+    public void setIO(XMLIO io) {
         this.io = ensureNotNull(io);
     }
 
@@ -80,7 +80,7 @@ public class XMLConverterDriver {
     }
     public void write(Writer drain, String name, Object value)
             throws XMLConversionException {
-        Document doc = io.createDocument();
+        Document doc = io.createDocument(name);
         write(doc, name, value);
         try {
             io.write(doc, drain);
@@ -90,7 +90,7 @@ public class XMLConverterDriver {
     }
     public String write(String name, Object value)
             throws XMLConversionException {
-        Document doc = io.createDocument();
+        Document doc = io.createDocument(name);
         write(doc, name, value);
         try {
             return io.writeString(doc);
