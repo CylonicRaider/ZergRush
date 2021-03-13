@@ -16,10 +16,10 @@ public class Highscores {
 
     public static class Entry implements Comparable<Entry> {
 
-        private final Statistics data;
+        private final GameStatistics data;
 
-        public Entry(Statistics data) {
-            this.data = new Statistics(data.entries());
+        public Entry(GameStatistics data) {
+            this.data = new GameStatistics(data);
         }
 
         public boolean equals(Object other) {
@@ -35,7 +35,7 @@ public class Highscores {
             return Long.compare(getDate(), other.getDate());
         }
 
-        public Statistics getData() {
+        public GameStatistics getData() {
             return data;
         }
 
@@ -61,7 +61,7 @@ public class Highscores {
 
         private final int index;
 
-        public NumberedEntry(Statistics data, int index) {
+        public NumberedEntry(GameStatistics data, int index) {
             super(data);
             this.index = index;
         }

@@ -1,6 +1,7 @@
 package net.zergrush.stats;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -77,9 +78,11 @@ public class GameStatistics extends Statistics {
         listeners = new CopyOnWriteArrayList<>();
         resetInner();
     }
+    public GameStatistics(GameStatistics copyFrom) {
+        this(copyFrom.entries());
+    }
     public GameStatistics() {
-        listeners = new CopyOnWriteArrayList<>();
-        resetInner();
+        this(Collections.<Entry<?>>emptyList());
     }
 
     public void addResetListener(ResetListener l) {
