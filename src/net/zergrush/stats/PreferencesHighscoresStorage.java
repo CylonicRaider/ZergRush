@@ -1,5 +1,7 @@
 package net.zergrush.stats;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import net.zergrush.Game;
 import net.zergrush.xml.XMLConversionException;
@@ -8,6 +10,9 @@ import net.zergrush.xml.XMLConverterDriver;
 public class PreferencesHighscoresStorage implements HighscoresStorage {
 
     public static final String DEFAULT_KEY = "highscores";
+
+    private static final Logger LOGGER = Logger.getLogger(
+        PreferencesHighscoresStorage.class.getName());
 
     private static final PreferencesHighscoresStorage DEFAULT =
         new PreferencesHighscoresStorage();
@@ -35,6 +40,7 @@ public class PreferencesHighscoresStorage implements HighscoresStorage {
             replacement = XMLConverterDriver.getDefault().read(data,
                 "highscores", Highscores.class);
         } catch (XMLConversionException exc) {
+            LOGGER.log(Level.SEVERE, "Could not load highscores:", exc);
             return false;
         }
         drain.clear();
@@ -48,6 +54,7 @@ public class PreferencesHighscoresStorage implements HighscoresStorage {
             data = XMLConverterDriver.getDefault().write("highscores",
                                                          source);
         } catch (XMLConversionException exc) {
+            LOGGER.log(Level.SEVERE, "Could not store highscores:", exc);
             return false;
         }
         node.put(key, data);
