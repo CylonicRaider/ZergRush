@@ -74,9 +74,9 @@ public class GameStatistics extends Statistics {
     private final List<ResetListener> listeners;
 
     public GameStatistics(Collection<Entry<?>> entries) {
-        super(entries);
         listeners = new CopyOnWriteArrayList<>();
         resetInner();
+        importEntries(entries);
     }
     public GameStatistics(GameStatistics copyFrom) {
         this(copyFrom.entries());

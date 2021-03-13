@@ -85,6 +85,10 @@ public class Statistics {
             this.displayer = displayer;
             this.listeners = new CopyOnWriteArrayList<>();
         }
+        public Entry(Entry<T> copyFrom) {
+            this(copyFrom.getKey(), copyFrom.getDescription(),
+                 copyFrom.getValue(), copyFrom.getDisplayer());
+        }
         public Entry(Key<T> key, T value) {
             this(key, null, value, null);
         }
@@ -155,9 +159,7 @@ public class Statistics {
 
     public Statistics(Collection<Entry<?>> entries) {
         this.data = new LinkedHashMap<>();
-        for (Entry<?> ent : entries) {
-            importEntry(ent, data);
-        }
+        importEntries(entries);
     }
     public Statistics(Map<Key<?>, Entry<?>> data) {
         this(validatedEntries(data));
@@ -169,11 +171,21 @@ public class Statistics {
         data = new LinkedHashMap<>();
     }
 
-    private <T> void importEntry(Entry<T> ent, Map<Key<?>, Entry<?>> drain) {
+    private <T> void importEntry(Entry<T> ent) {
         // We need to outline this into a method in order to be able to name
         // the type variable.
-        drain.put(ent.getKey(), new Entry<>(ent.getKey(),
-            ent.getDescription(), ent.getValue(), ent.getDisplayer()));
+        Entry<T> existing = getEntry(ent.getKey());
+        if (existing != null) {
+            existing.setValue(ent.getValue());
+        } else {
+            data.put(ent.getKey(), new Entry<>(ent));
+        }
+    }
+
+    protected void importEntries(Collection<Entry<?>> entries) {
+        for (Entry<?> ent : entries) {
+            importEntry(ent);
+        }
     }
 
     public <T> Entry<T> getEntry(Key<T> key) {
