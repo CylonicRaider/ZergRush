@@ -17,7 +17,7 @@ public class HighscoresPageRenderer extends TablePageRenderer {
             selectIndex = ((SelectedHighscores) data).getIndex();
         } else {
             throw new ClassCastException("Cannot render object of type " +
-                data.getClass().getName());
+                className(data));
         }
         writer.header("#");
         writer.header("Name");
@@ -50,6 +50,11 @@ public class HighscoresPageRenderer extends TablePageRenderer {
             }
         }
         super.renderReplacements(pageName, data, drain);
+    }
+
+    private static String className(Object obj) {
+        if (obj == null) return "null";
+        return obj.getClass().getName();
     }
 
 }
