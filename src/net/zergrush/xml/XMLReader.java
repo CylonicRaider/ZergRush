@@ -29,7 +29,7 @@ public class XMLReader implements Iterable<DataItem> {
                 childIndex = copyFrom.childIndex;
             }
             public ItemIterator() {
-                if (source.isAttribute()) {
+                if (! source.isAttribute()) {
                     advance();
                 } else {
                     next = new DataItem("value", source.getAttributeValue());
@@ -43,12 +43,12 @@ public class XMLReader implements Iterable<DataItem> {
                     next = null;
                     return;
                 }
+                next = null;
                 if (attrIndex < attributes.getLength()) {
                      Attr cur = (Attr) attributes.item(attrIndex++);
                      next = new DataItem(cur.getName(), cur.getValue());
-                     return;
                 }
-                while (childIndex < children.getLength()) {
+                while (next == null && childIndex < children.getLength()) {
                     Node child = children.item(childIndex++);
                     if (! (child instanceof Element)) continue;
                     next = new DataItem((Element) child);
@@ -90,23 +90,25 @@ public class XMLReader implements Iterable<DataItem> {
         private final DataItem source;
         private final NamedNodeMap attributes;
         private final NodeList children;
-        private final ItemIterator iter;
         private final Map<String, List<DataItem>> index;
+        private final ItemIterator iter;
         private boolean indexDone;
 
         public State(State parent, DataItem source) {
             this.parent = parent;
             this.source = source;
-            if (source.isAttribute()) {
+            if (! source.isAttribute()) {
                 attributes = source.getElementValue().getAttributes();
                 children = source.getElementValue().getChildNodes();
             } else {
                 attributes = null;
                 children = null;
             }
-            iter = new ItemIterator();
+            // These need to be initialized first as the ItemIterator
+            // constructor may advance() immediately.
             index = new LinkedHashMap<>();
             indexDone = false;
+            iter = new ItemIterator();
         }
 
         public State getParent() {
