@@ -60,7 +60,7 @@ public class XMLConverterDriver {
     public <T> T read(Reader source, String expectedName, Class<T> cls)
             throws XMLConversionException {
         try {
-            return read(io.read(source), expectedName, cls);
+            return read(io.read(source, false), expectedName, cls);
         } catch (IOException exc) {
             throw new XMLConversionException(exc);
         }
@@ -68,7 +68,7 @@ public class XMLConverterDriver {
     public <T> T read(String source, String expectedName, Class<T> cls)
             throws XMLConversionException {
         try {
-            return read(io.readString(source), expectedName, cls);
+            return read(io.readString(source, false), expectedName, cls);
         } catch (IOException exc) {
             throw new XMLConversionException(exc);
         }
@@ -83,7 +83,7 @@ public class XMLConverterDriver {
         Document doc = io.createDocument(name);
         write(doc, name, value);
         try {
-            io.write(doc, drain);
+            io.write(doc, drain, false);
         } catch (IOException exc) {
             throw new XMLConversionException(exc);
         }
@@ -93,7 +93,7 @@ public class XMLConverterDriver {
         Document doc = io.createDocument(name);
         write(doc, name, value);
         try {
-            return io.writeString(doc);
+            return io.writeString(doc, false);
         } catch (IOException exc) {
             throw new XMLConversionException(exc);
         }

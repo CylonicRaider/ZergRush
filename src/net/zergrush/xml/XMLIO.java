@@ -31,11 +31,8 @@ public abstract class XMLIO {
             private final DOMError source;
 
             public DOMErrorException(DOMError source) {
-                super(formatMessage(source));
-                this.source = source;
-            }
-            public DOMErrorException(DOMError source, Throwable cause) {
-                super(formatMessage(source), cause);
+                super(formatMessage(source),
+                      prepareCause(source.getRelatedException()));
                 this.source = source;
             }
 
@@ -64,6 +61,11 @@ public abstract class XMLIO {
                     err.getMessage();
             }
 
+            private static Throwable prepareCause(Object exception) {
+                return (exception instanceof Throwable) ?
+                    (Throwable) exception : null;
+            }
+
         }
 
         public static class StoringErrorHandler implements DOMErrorHandler {
@@ -72,10 +74,6 @@ public abstract class XMLIO {
 
             public DOMErrorException getError() {
                 return error;
-            }
-
-            public void addTo(DOMConfiguration config) throws DOMException {
-                config.setParameter("error-handler", this);
             }
 
             public boolean handleError(DOMError error) {
@@ -123,14 +121,22 @@ public abstract class XMLIO {
             return impl.createDocument(null, rootNodeName, null);
         }
 
-        public Document read(Reader source) throws IOException {
+        protected void configure(DOMConfiguration config,
+                                 StoringErrorHandler eh,
+                                 boolean namespaceAware) throws DOMException {
+            config.setParameter("error-handler", eh);
+            config.setParameter("namespaces", namespaceAware);
+        }
+
+        public Document read(Reader source, boolean namespaceAware)
+                throws IOException {
             LSInput input = ((DOMImplementationLS) impl).createLSInput();
             input.setCharacterStream(source);
             StoringErrorHandler eh = new StoringErrorHandler();
             try {
                 LSParser p = ((DOMImplementationLS) impl).createLSParser(
                     DOMImplementationLS.MODE_SYNCHRONOUS, null);
-                eh.addTo(p.getDomConfig());
+                configure(p.getDomConfig(), eh, namespaceAware);
                 return p.parse(input);
             } catch (DOMException exc) {
                 throw new IOException(eh.augment(exc));
@@ -139,14 +145,15 @@ public abstract class XMLIO {
             }
         }
 
-        public void write(Document doc, Writer drain) throws IOException {
+        public void write(Document doc, Writer drain, boolean namespaceAware)
+                throws IOException {
             LSOutput output = ((DOMImplementationLS) impl).createLSOutput();
             output.setCharacterStream(drain);
             StoringErrorHandler eh = new StoringErrorHandler();
             try {
                 LSSerializer s = ((DOMImplementationLS) impl)
                     .createLSSerializer();
-                eh.addTo(s.getDomConfig());
+                configure(s.getDomConfig(), eh, namespaceAware);
                 if (! s.write(doc, output))
                     throw eh.augment(new IOException(
                         "Could not serialize document"));
@@ -176,17 +183,21 @@ public abstract class XMLIO {
 
     public abstract Document createDocument(String rootNodeName);
 
-    public abstract Document read(Reader source) throws IOException;
+    public abstract Document read(Reader source,
+                                  boolean namespaceAware) throws IOException;
 
-    public abstract void write(Document doc, Writer drain) throws IOException;
+    public abstract void write(Document doc, Writer drain,
+                               boolean namespaceAware) throws IOException;
 
-    public Document readString(String source) throws IOException {
-        return read(new StringReader(source));
+    public Document readString(String source, boolean namespaceAware)
+            throws IOException {
+        return read(new StringReader(source), namespaceAware);
     }
 
-    public String writeString(Document doc) throws IOException {
+    public String writeString(Document doc, boolean namespaceAware)
+            throws IOException {
         StringWriter wr = new StringWriter();
-        write(doc, wr);
+        write(doc, wr, namespaceAware);
         return wr.toString();
     }
 
