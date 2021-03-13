@@ -6,14 +6,19 @@ public class SimpleDisplayer<T> implements Statistics.Displayer<T> {
 
     private final Locale locale;
     private final String format;
+    private final String nullValue;
 
-    public SimpleDisplayer(Locale locale, String format) {
+    public SimpleDisplayer(Locale locale, String format, String nullValue) {
         if (format == null) throw new NullPointerException();
         this.locale = locale;
         this.format = format;
+        this.nullValue = nullValue;
+    }
+    public SimpleDisplayer(String format, String nullValue) {
+        this(null, format, nullValue);
     }
     public SimpleDisplayer(String format) {
-        this(null, format);
+        this(null, format, null);
     }
 
     public Locale getLocale() {
@@ -24,7 +29,12 @@ public class SimpleDisplayer<T> implements Statistics.Displayer<T> {
         return format;
     }
 
+    public String getNullValue() {
+        return nullValue;
+    }
+
     public String display(T value) {
+        if (nullValue != null) return nullValue;
         return String.format(locale, format, value);
     }
 

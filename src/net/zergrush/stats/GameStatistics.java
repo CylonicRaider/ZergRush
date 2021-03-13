@@ -23,10 +23,12 @@ public class GameStatistics extends Statistics {
 
     protected static final Set<Key<?>> KEYS;
     protected static final Displayer<Long> DATE_DISPLAYER;
+    protected static final Displayer<String> NAME_DISPLAYER;
 
     static {
         KEYS = new LinkedHashSet<>();
         DATE_DISPLAYER = new SimpleDisplayer<Long>("%tF %<tT %<tZ");
+        NAME_DISPLAYER = new SimpleDisplayer<String>("%s", "(N/A)");
         XMLConverterRegistry.getDefault().add(GameStatistics.class,
             new XMLConverter<GameStatistics>() {
 
@@ -104,6 +106,7 @@ public class GameStatistics extends Statistics {
         init(STARTED, "Game started", System.currentTimeMillis(),
              DATE_DISPLAYER);
         init(ENDED, "Game ended", Long.MAX_VALUE, DATE_DISPLAYER);
+        init(NAME, "Player name", null, NAME_DISPLAYER);
     }
 
     protected void fireResetListeners() {
