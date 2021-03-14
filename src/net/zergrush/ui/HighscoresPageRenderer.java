@@ -43,7 +43,7 @@ public class HighscoresPageRenderer extends TablePageRenderer {
 
     protected void renderReplacements(String pageName, Object data,
                                       Map<String, String> drain) {
-        drain.put("title", "Game statistics");
+        drain.put("title", "Highscores");
         if (data instanceof SelectedHighscores) {
             drain.put("form", Boolean.toString(true));
             int index = ((SelectedHighscores) data).getIndex();
