@@ -54,6 +54,7 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
     private final Map<String, PageRenderer> pageRenderers;
     private TitleChangeListener titleListener;
     private PageActionListener actionListener;
+    private String lastTitle;
 
     public HTMLPane() {
         scroller = new JScrollPane();
@@ -107,6 +108,16 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         return (String) doc.getProperty(Document.TitleProperty);
     }
 
+    protected void updateTitle() {
+        String newTitle = getTitle();
+        if ((newTitle == null) ? lastTitle == null :
+                                 newTitle.equals(lastTitle))
+            return;
+        lastTitle = newTitle;
+        if (titleListener != null)
+            titleListener.titleChanged(this, newTitle);
+    }
+
     public void hyperlinkUpdate(HyperlinkEvent e) {
         // Code adapted from JEditorPane docs.
         if (e.getEventType() != HyperlinkEvent.EventType.ACTIVATED)
@@ -152,8 +163,7 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         if (e.getSource() == content && e.getPropertyName().equals("page")) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if (titleListener != null)
-                        titleListener.titleChanged(HTMLPane.this, getTitle());
+                    updateTitle();
                 }
             });
         }
@@ -195,19 +205,23 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
 
     public void loadPage(String text) {
         reset();
-        if (text == null) return;
-        content.setText(text);
+        if (text != null) content.setText(text);
+        updateTitle();
     }
 
     public void loadGeneratedPage(String name, Object data) {
         reset();
-        if (name == null) return;
-        PageRenderer gen = getPageRenderer(name);
-        if (gen == null) return;
-        URL baseURL = gen.getBaseURL();
-        if (baseURL != null && content.getDocument() instanceof HTMLDocument)
-            ((HTMLDocument) content.getDocument()).setBase(baseURL);
-        content.setText(gen.renderPage(this, name, data));
+        if (name != null) {
+            PageRenderer gen = getPageRenderer(name);
+            if (gen != null) {
+                URL baseURL = gen.getBaseURL();
+                if (baseURL != null &&
+                        content.getDocument() instanceof HTMLDocument)
+                    ((HTMLDocument) content.getDocument()).setBase(baseURL);
+                content.setText(gen.renderPage(this, name, data));
+            }
+        }
+        updateTitle();
     }
 
 }
