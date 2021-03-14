@@ -6,6 +6,8 @@ import net.zergrush.stats.Statistics;
 public class StatisticsPageRenderer extends TablePageRenderer {
 
     protected void renderCells(Object data, CellWriter writer) {
+        writer.nextColumn().align(Alignment.LEFT).width(Width.COMPACT);
+        writer.nextColumn().align(Alignment.LEFT);
         writer.header("Statistic");
         writer.header("Value");
         writer.finishRow();

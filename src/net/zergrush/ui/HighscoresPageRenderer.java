@@ -19,6 +19,9 @@ public class HighscoresPageRenderer extends TablePageRenderer {
             throw new ClassCastException("Cannot render object of type " +
                 className(data));
         }
+        writer.nextColumn().align(Alignment.RIGHT).width(Width.COMPACT);
+        writer.nextColumn().align(Alignment.CENTER);
+        writer.nextColumn().align(Alignment.RIGHT).width(Width.COMPACT);
         writer.header("#");
         writer.header("Name");
         writer.header("Score");
