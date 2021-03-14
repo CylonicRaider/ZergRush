@@ -1,27 +1,127 @@
 package net.zergrush.ui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public abstract class TablePageRenderer extends SimplePageRenderer {
 
+    protected enum Alignment {
+        LEFT, CENTER, RIGHT;
+
+        public String toString() {
+            return name().toLowerCase();
+        }
+    }
+
+    protected enum Width { COMPACT }
+
+    protected static class CellParameters {
+
+        private Alignment align;
+        private Width width;
+
+        public CellParameters() {
+            align = null;
+            width = null;
+        }
+        public CellParameters(CellParameters copyFrom) {
+            align = copyFrom.align();
+            width = copyFrom.width();
+        }
+
+        public Alignment align() {
+            return align;
+        }
+
+        public Width width() {
+            return width;
+        }
+
+        public CellParameters align(Alignment newAlign) {
+            align = newAlign;
+            return this;
+        }
+
+        public CellParameters width(Width newWidth) {
+            width = newWidth;
+            return this;
+        }
+
+    }
+
     protected static class CellWriter {
 
         private final StringBuilder drain;
+        private final List<CellParameters> colParams;
         private boolean insideRow;
+        private int column;
+        private CellParameters nextCellParams;
 
         public CellWriter(StringBuilder drain) {
             this.drain = drain;
+            this.colParams = new ArrayList<>();
+        }
+
+        public CellParameters column(int index) {
+            if (index < 0)
+                throw new IndexOutOfBoundsException(
+                    "Column index must be >= 0");
+            while (colParams.size() >= index) colParams.add(null);
+            CellParameters ret = colParams.get(index);
+            if (ret == null) {
+                ret = new CellParameters();
+                colParams.set(index, ret);
+            }
+            return ret;
+        }
+
+        public CellParameters nextColumn() {
+            colParams.add(new CellParameters());
+            return colParams.get(colParams.size() - 1);
         }
 
         private void maybeStartRow() {
             if (insideRow) return;
             drain.append("<tr>");
             insideRow = true;
+            column = 0;
+        }
+
+        public CellParameters params() {
+            if (nextCellParams == null) {
+                if (column < colParams.size())
+                    nextCellParams = new CellParameters(
+                        colParams.get(column));
+                if (nextCellParams == null)
+                    nextCellParams = new CellParameters();
+            }
+            return nextCellParams;
+        }
+
+        private void startCell(String tag) {
+            drain.append('<').append(tag);
+            if (nextCellParams == null && column < colParams.size()) {
+                nextCellParams = colParams.get(column);
+            }
+            if (nextCellParams != null) {
+                Alignment align = nextCellParams.align();
+                if (align != null)
+                    drain.append(" align=\"").append(align).append("\"");
+                Width width = nextCellParams.width();
+                if (width == Width.COMPACT)
+                    drain.append(" width=\"0\" nowrap=\"nowrap\"");
+            }
+            drain.append('>');
+            column++;
+            nextCellParams = null;
         }
 
         public void header(String html) {
             maybeStartRow();
-            drain.append("<th>").append(html).append("</th>");
+            startCell("th");
+            drain.append(html);
+            drain.append("</th>");
         }
 
         public void headerEsc(Object value) {
@@ -30,7 +130,9 @@ public abstract class TablePageRenderer extends SimplePageRenderer {
 
         public void data(String html) {
             maybeStartRow();
-            drain.append("<td>").append(html).append("</td>");
+            startCell("td");
+            drain.append(html);
+            drain.append("</td>");
         }
 
         public void dataEsc(Object value) {
