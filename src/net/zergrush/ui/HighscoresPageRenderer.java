@@ -39,7 +39,7 @@ public class HighscoresPageRenderer extends TablePageRenderer {
             }
             writer.dataEsc(item.getScore());
             writer.data("&nbsp;(<a href=\"info:stats/" + item.getIndex() +
-                "\">more</a>)");
+                "\">more&hellip;</a>)");
             writer.nextRow();
         }
     }
