@@ -99,6 +99,11 @@ public class Game {
         ui.onGameStateChange();
     }
 
+    public InfoScreenRequest getInfoScreenData(String pageName) {
+        if (pageName == null) return null;
+        return new InfoScreenRequest(pageName);
+    }
+
     protected void reset() {
         stats.reset();
         base = new Base(this, null);

@@ -28,6 +28,7 @@ import javax.swing.Timer;
 import javax.swing.event.HyperlinkEvent;
 import net.zergrush.Game;
 import net.zergrush.GameUI;
+import net.zergrush.InfoScreenRequest;
 import net.zergrush.KeyboardAction;
 import net.zergrush.stats.GameStatistics;
 import net.zergrush.stats.Statistics;
@@ -58,7 +59,7 @@ public class MainUI extends JPanel implements GameUI,
     private final JLabel scoreMessage;
     private final Map<Integer, Integer> keyStates;
     private HTMLDialog dialog;
-    private InfoScreenCallback dialogCallback;
+    private InfoScreenRequest dialogRequest;
 
     public MainUI() {
         gameArea = new GameArea();
@@ -67,7 +68,7 @@ public class MainUI extends JPanel implements GameUI,
         scoreMessage = new JLabel();
         keyStates = new HashMap<>();
         dialog = null;
-        dialogCallback = null;
+        dialogRequest = null;
         createUI();
     }
 
@@ -179,15 +180,14 @@ public class MainUI extends JPanel implements GameUI,
         if (url != null && url.startsWith("info:")) {
             newLocation = url.substring(5);
         }
-        if (dialogCallback != null) {
-            newLocation = dialogCallback.onInfoScreenDone(formData);
-            dialogCallback = null;
+        InfoScreenRequest newRequest = null;
+        if (dialogRequest != null) {
+            newRequest = dialogRequest.onDone(newLocation, formData);
         }
-        if (newLocation != null) {
-            showInfoScreen(newLocation);
-        } else {
-            closeWindow(dialog);
+        if (newRequest == null && newLocation != null) {
+            newRequest = new InfoScreenRequest(newLocation);
         }
+        showInfoScreen(newRequest);
         return true;
     }
 
@@ -262,20 +262,23 @@ public class MainUI extends JPanel implements GameUI,
     }
 
     public void showInfoScreen(String name) {
-        showInfoScreen(name, null, null);
+        showInfoScreen(gameArea.getGame().getInfoScreenData(name));
     }
 
-    public void showInfoScreen(String name, Object data,
-                               InfoScreenCallback cb) {
+    public void showInfoScreen(InfoScreenRequest req) {
         HTMLDialog d = getHTMLDialog();
+        if (req == null) {
+            closeWindow(d);
+            return;
+        }
+        String name = req.getPageName();
         if (d.getDisplay().hasPageRenderer(name)) {
-            d.getDisplay().loadGeneratedPage(name, data);
-            dialogCallback = cb;
+            d.getDisplay().loadGeneratedPage(name, req.getPageData());
         } else {
             d.getDisplay().loadPage(getClass().getResource("/res/" + name +
                                                            ".html"));
-            dialogCallback = null;
         }
+        dialogRequest = req;
         d.setVisible(true);
     }
 
