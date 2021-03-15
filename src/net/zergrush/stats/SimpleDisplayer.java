@@ -34,7 +34,7 @@ public class SimpleDisplayer<T> implements Statistics.Displayer<T> {
     }
 
     public String display(T value) {
-        if (nullValue != null) return nullValue;
+        if (value == null && nullValue != null) return nullValue;
         return String.format(locale, format, value);
     }
 

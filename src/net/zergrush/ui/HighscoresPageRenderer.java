@@ -22,6 +22,7 @@ public class HighscoresPageRenderer extends TablePageRenderer {
         writer.nextColumn().align(Alignment.RIGHT).width(Width.COMPACT);
         writer.nextColumn().align(Alignment.CENTER);
         writer.nextColumn().align(Alignment.RIGHT).width(Width.COMPACT);
+        writer.nextColumn().align(Alignment.RIGHT).width(Width.COMPACT);
         writer.header("#");
         writer.header("Name");
         writer.header("Score");
@@ -37,6 +38,8 @@ public class HighscoresPageRenderer extends TablePageRenderer {
                 writer.dataEsc(item.getName());
             }
             writer.dataEsc(item.getScore());
+            writer.data("&nbsp;(<a href=\"info:stats/" + item.getIndex() +
+                "\">more</a>)");
             writer.nextRow();
         }
     }

@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import net.zergrush.sprites.Base;
@@ -15,11 +16,49 @@ import net.zergrush.sprites.Player;
 import net.zergrush.sprites.Sprite;
 import net.zergrush.sprites.Zerg;
 import net.zergrush.stats.GameStatistics;
+import net.zergrush.stats.Highscores;
 import net.zergrush.stats.HighscoresStorage;
+import net.zergrush.stats.SelectedHighscores;
 
 public class Game {
 
     public enum State { INTRO, PLAYING, PAUSED, OVER };
+
+    private static class HighscoresRequest extends InfoScreenRequest {
+
+        private final Highscores hs;
+
+        public HighscoresRequest(Highscores hs) {
+            super("highscores", hs);
+            this.hs = hs;
+        }
+        public HighscoresRequest(HighscoresStorage storage) {
+            this(storage.createHighscores());
+            storage.retrieveHighscores(hs);
+        }
+
+        public InfoScreenRequest onDone(String newPageName, Object result) {
+            if (newPageName.startsWith("stats/")) {
+                int index;
+                try {
+                    index = Integer.parseInt(newPageName.substring(6));
+                } catch (NumberFormatException exc) {
+                    index = -1;
+                }
+                GameStatistics stats;
+                try {
+                    stats = hs.getTopEntry(index).getData();
+                } catch (IndexOutOfBoundsException exc) {
+                    stats = null;
+                }
+                if (stats != null) {
+                    return new InfoScreenRequest("statistics", stats);
+                }
+            }
+            return super.onDone(newPageName, result);
+        }
+
+    }
 
     public static final int UPDATE_INTERVAL = 16;
     public static final double ZERG_SPAWN_COUNTER = 60;
@@ -77,7 +116,8 @@ public class Game {
         switch (s) {
             case INTRO:
                 ui.setMessage("ZERG RUSH",
-                    new KeyboardAction("Enter", "start"));
+                    new KeyboardAction("Enter", "start"),
+                    new KeyboardAction("F3", "highscores"));
                 break;
             case PLAYING:
                 ui.setMessage(null);
@@ -91,6 +131,7 @@ public class Game {
                 ui.setMessage("GAME OVER",
                     new KeyboardAction("Enter", "retry"),
                     new KeyboardAction("Escape", "quit"));
+                maybeAddHighscore();
                 base = null;
                 player = null;
                 ui.markDamaged(null);
@@ -101,6 +142,13 @@ public class Game {
 
     public InfoScreenRequest getInfoScreenData(String pageName) {
         if (pageName == null) return null;
+        switch (pageName) {
+            case "highscores":
+                return new HighscoresRequest(hsStorage);
+            case "statistics":
+                return new InfoScreenRequest("statistics",
+                                             new GameStatistics(stats));
+        }
         return new InfoScreenRequest(pageName);
     }
 
@@ -142,6 +190,10 @@ public class Game {
         if (isKeyPressedFirst(KeyEvent.VK_F1)) {
             if (state == State.PLAYING) setState(State.PAUSED);
             ui.showInfoScreen("intro");
+        }
+        if (isKeyPressedFirst(KeyEvent.VK_F3)) {
+            if (state == State.PLAYING) setState(State.PAUSED);
+            ui.showInfoScreen("highscores");
         }
         if (isKeyPressedFirst(KeyEvent.VK_PAUSE)) {
             if (state == State.PLAYING) {
@@ -246,6 +298,39 @@ public class Game {
     public boolean isKeyPressedFirst(int keyCode) {
         int status = ui.getKeyStatus(keyCode);
         return status == GameUI.KEY_PRESSED_INITIAL;
+    }
+
+    private void maybeAddHighscore() {
+        final Highscores hs = hsStorage.createHighscores();
+        hsStorage.retrieveHighscores(hs);
+        final Highscores.Entry newEnt = new Highscores.Entry(
+            new GameStatistics(stats));
+        final SelectedHighscores selection = SelectedHighscores.addAndLocate(
+            hs, newEnt);
+        if (selection.getIndex() == -1 ||
+                selection.getIndex() >= Highscores.MAX_SIZE)
+            return;
+        ui.showInfoScreen(new InfoScreenRequest("highscores", selection) {
+            public InfoScreenRequest onDone(String newPageName,
+                                            Object result) {
+                @SuppressWarnings("unchecked")
+                Map<String, String> formData =
+                    (Map<String, String>) result;
+                if (! formData.get("index").equals(
+                        String.valueOf(selection.getIndex())))
+                    return null;
+                String name = formData.get("name");
+                if (name == null || name.isEmpty()) name = "(anonymous)";
+                newEnt.getData().put(GameStatistics.NAME, name);
+                // Re-read highscores to reduce race condition opportunity
+                // windows among multiple instances of the program.
+                hs.clear();
+                hsStorage.retrieveHighscores(hs);
+                hs.add(newEnt);
+                hsStorage.storeHighscores(hs);
+                return getInfoScreenData("highscores");
+            }
+        });
     }
 
 }

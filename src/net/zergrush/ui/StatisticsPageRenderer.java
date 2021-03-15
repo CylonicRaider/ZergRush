@@ -12,7 +12,7 @@ public class StatisticsPageRenderer extends TablePageRenderer {
         writer.header("Value");
         writer.finishRow();
         for (Statistics.Entry<?> item : ((Statistics) data).entries()) {
-            writer.dataEsc(item.getDescription());
+            writer.data(escapeHTML(item.getDescription()) + ":&nbsp;");
             writer.dataEsc(item.getDisplayedValue());
             writer.finishRow();
         }
