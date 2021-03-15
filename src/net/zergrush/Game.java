@@ -130,7 +130,7 @@ public class Game {
                 stats.put(GameStatistics.ENDED, System.currentTimeMillis());
                 ui.setMessage("GAME OVER",
                     new KeyboardAction("Enter", "retry"),
-                    new KeyboardAction("Escape", "quit"));
+                    new KeyboardAction("F2", "statistics"));
                 maybeAddHighscore();
                 base = null;
                 player = null;
@@ -190,6 +190,9 @@ public class Game {
         if (isKeyPressedFirst(KeyEvent.VK_F1)) {
             if (state == State.PLAYING) setState(State.PAUSED);
             ui.showInfoScreen("intro");
+        }
+        if (isKeyPressedFirst(KeyEvent.VK_F2) && state == State.OVER) {
+            ui.showInfoScreen("statistics");
         }
         if (isKeyPressedFirst(KeyEvent.VK_F3)) {
             if (state == State.PLAYING) setState(State.PAUSED);
@@ -321,6 +324,7 @@ public class Game {
                     return null;
                 String name = formData.get("name");
                 if (name == null || name.isEmpty()) name = "(anonymous)";
+                stats.put(GameStatistics.NAME, name);
                 newEnt.getData().put(GameStatistics.NAME, name);
                 // Re-read highscores to reduce race condition opportunity
                 // windows among multiple instances of the program.
