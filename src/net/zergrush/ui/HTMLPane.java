@@ -207,6 +207,9 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         reset();
         if (text != null) content.setText(text);
         updateTitle();
+        // Sometimes, the contents won't repaint for some reason; try to
+        // force that here.
+        repaint();
     }
 
     public void loadGeneratedPage(String name, Object data) {
@@ -222,6 +225,8 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
             }
         }
         updateTitle();
+        // See the corresponding comment in loadPage(String).
+        repaint();
     }
 
 }
