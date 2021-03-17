@@ -7,7 +7,15 @@ import java.util.Map;
 public abstract class TablePageRenderer extends SimplePageRenderer {
 
     protected enum Alignment {
-        LEFT, CENTER, RIGHT;
+        LEFT, CENTER, RIGHT, JUSTIFY;
+
+        public String toString() {
+            return name().toLowerCase();
+        }
+    }
+
+    protected enum VertAlignment {
+        TOP, MIDDLE, BOTTOM;
 
         public String toString() {
             return name().toLowerCase();
@@ -19,19 +27,26 @@ public abstract class TablePageRenderer extends SimplePageRenderer {
     protected static class CellParameters {
 
         private Alignment align;
+        private VertAlignment valign;
         private Width width;
 
         public CellParameters() {
             align = null;
+            valign = VertAlignment.TOP;
             width = null;
         }
         public CellParameters(CellParameters copyFrom) {
             align = copyFrom.align();
+            valign = copyFrom.valign();
             width = copyFrom.width();
         }
 
         public Alignment align() {
             return align;
+        }
+
+        public VertAlignment valign() {
+            return valign;
         }
 
         public Width width() {
@@ -40,6 +55,11 @@ public abstract class TablePageRenderer extends SimplePageRenderer {
 
         public CellParameters align(Alignment newAlign) {
             align = newAlign;
+            return this;
+        }
+
+        public CellParameters valign(VertAlignment newVAlign) {
+            valign = newVAlign;
             return this;
         }
 
@@ -108,6 +128,9 @@ public abstract class TablePageRenderer extends SimplePageRenderer {
                 Alignment align = nextCellParams.align();
                 if (align != null)
                     drain.append(" align=\"").append(align).append("\"");
+                VertAlignment valign = nextCellParams.valign();
+                if (valign != null)
+                    drain.append(" valign=\"").append(valign).append("\"");
                 Width width = nextCellParams.width();
                 if (width == Width.COMPACT)
                     drain.append(" width=\"0\" nowrap=\"nowrap\"");
