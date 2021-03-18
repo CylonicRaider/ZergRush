@@ -47,11 +47,14 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
 
     }
 
+    private enum AutofocusState { IDLE, BLOCKED, PENDING }
+
     private static final long serialVersionUID = -1724213395749874932L;
 
     private final JScrollPane scroller;
     private final JEditorPane content;
     private final Map<String, PageRenderer> pageRenderers;
+    private AutofocusState afState;
     private TitleChangeListener titleListener;
     private PageActionListener actionListener;
     private String lastTitle;
@@ -60,6 +63,7 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         scroller = new JScrollPane();
         content = createContent();
         pageRenderers = new HashMap<>();
+        afState = AutofocusState.BLOCKED;
         createUI();
     }
 
@@ -164,6 +168,7 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     updateTitle();
+                    setAutofocusState(AutofocusState.IDLE);
                 }
             });
         }
@@ -185,6 +190,12 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         pageRenderers.remove(name);
     }
 
+    private void setAutofocusState(AutofocusState newState) {
+        boolean needFocus = (afState == AutofocusState.PENDING);
+        afState = newState;
+        if (needFocus) autofocus();
+    }
+
     protected void reset() {
         EditorKit editor = content.getEditorKit();
         content.setDocument(editor.createDefaultDocument());
@@ -201,6 +212,7 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         } catch (IOException exc) {
             throw new RuntimeException(exc);
         }
+        setAutofocusState(AutofocusState.BLOCKED);
     }
 
     public void loadPage(String text) {
@@ -210,6 +222,7 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         // Sometimes, the contents won't repaint for some reason; try to
         // force that here.
         repaint();
+        setAutofocusState(AutofocusState.IDLE);
     }
 
     public void loadGeneratedPage(String name, Object data) {
@@ -227,6 +240,15 @@ public class HTMLPane extends JPanel implements HyperlinkListener,
         updateTitle();
         // See the corresponding comment in loadPage(String).
         repaint();
+        setAutofocusState(AutofocusState.IDLE);
+    }
+
+    public void autofocus() {
+        if (afState == AutofocusState.BLOCKED) {
+            setAutofocusState(AutofocusState.PENDING);
+            return;
+        }
+        getContent().transferFocus();
     }
 
 }

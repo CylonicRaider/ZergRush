@@ -280,6 +280,7 @@ public class MainUI extends JPanel implements GameUI,
         }
         dialogRequest = req;
         d.setVisible(true);
+        d.getDisplay().autofocus();
     }
 
     // While this is not strictly not a responsibility of the UI, Swing likes
