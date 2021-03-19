@@ -12,6 +12,8 @@ import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
@@ -37,7 +39,7 @@ public class MainUI extends JPanel implements GameUI,
         GameArea.FontSizeListener, GameStatistics.ResetListener,
         HTMLPane.PageActionListener {
 
-    protected class KeyTracker extends KeyAdapter {
+    protected class EventTracker extends KeyAdapter implements FocusListener {
 
         public void keyPressed(KeyEvent e) {
             keyStates.put(e.getKeyCode(), KEY_PRESSED_INITIAL);
@@ -45,6 +47,14 @@ public class MainUI extends JPanel implements GameUI,
 
         public void keyReleased(KeyEvent e) {
             keyStates.remove(e.getKeyCode());
+        }
+
+        public void focusGained(FocusEvent e) {}
+
+        public void focusLost(FocusEvent e) {
+            // After losing focus, we may not receive key release events;
+            // clear all key states to prevent perceivedly stuck keys.
+            keyStates.clear();
         }
 
     }
@@ -81,7 +91,9 @@ public class MainUI extends JPanel implements GameUI,
     protected void createUI() {
         setBackground(GameArea.BORDER_COLOR);
         setLayout(new SquareLayout());
-        addKeyListener(new KeyTracker());
+        EventTracker et = new EventTracker();
+        addKeyListener(et);
+        addFocusListener(et);
 
         JPanel gameLayers = new JPanel();
         gameLayers.setBackground(GameArea.BACKGROUND_COLOR);
