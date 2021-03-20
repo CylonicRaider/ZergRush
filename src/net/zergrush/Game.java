@@ -63,6 +63,7 @@ public class Game {
     public static final int UPDATE_INTERVAL = 16;
     public static final double ZERG_SPAWN_COUNTER = 60;
     public static final double ZERG_SPAWN_COUNTER_DECR = 0.995;
+    public static final int GAME_OVER_COUNTER = 15;
 
     private final HighscoresStorage hsStorage;
     private final GameUI ui;
@@ -74,6 +75,7 @@ public class Game {
     private final List<Zerg> zergs;
     private int zergSpawnCounter;
     private double nextZergSpawnCounter;
+    private int gameOverCounter;
 
     public Game(HighscoresStorage hsStorage, GameUI ui) {
         this.hsStorage = hsStorage;
@@ -85,6 +87,7 @@ public class Game {
         this.zergs = new ArrayList<>();
         this.zergSpawnCounter = 0;
         this.nextZergSpawnCounter = ZERG_SPAWN_COUNTER;
+        this.gameOverCounter = GAME_OVER_COUNTER;
         initUI();
     }
 
@@ -159,6 +162,7 @@ public class Game {
         zergs.clear();
         zergSpawnCounter = 0;
         nextZergSpawnCounter = ZERG_SPAWN_COUNTER;
+        gameOverCounter = GAME_OVER_COUNTER;
         ui.markDamaged(null);
     }
 
@@ -219,8 +223,8 @@ public class Game {
             updateSprite(base);
             updateSpriteList(zergs);
             updateSprite(player);
-            /* Spawn new zergs as necessary */
             if (state == State.PLAYING) {
+                /* Spawn new zergs as necessary */
                 if (zergSpawnCounter-- <= 0) {
                     zergSpawnCounter = (int) nextZergSpawnCounter;
                     nextZergSpawnCounter *= ZERG_SPAWN_COUNTER_DECR;
@@ -232,7 +236,14 @@ public class Game {
                                              position.getX());
                     zergs.add(new Zerg(this, position));
                 }
-                if (player == null || base == null) setState(State.OVER);
+                /* End the game if the time has come */
+                if (player == null || base == null) {
+                    if (gameOverCounter > 0) {
+                        gameOverCounter--;
+                    } else {
+                        setState(State.OVER);
+                    }
+                }
             }
         }
         /* Drain run queue */
