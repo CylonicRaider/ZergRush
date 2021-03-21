@@ -189,7 +189,11 @@ public class Game {
     public boolean update() {
         /* Check for keyboard input */
         if (isKeyPressed(KeyEvent.VK_ESCAPE)) {
-            return false;
+            if (state == State.PLAYING) {
+                setState(State.OVER);
+            } else {
+                return false;
+            }
         }
         if (isKeyPressedFirst(KeyEvent.VK_F1)) {
             if (state == State.PLAYING) setState(State.PAUSED);
